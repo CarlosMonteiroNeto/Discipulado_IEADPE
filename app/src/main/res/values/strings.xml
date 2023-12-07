@@ -1,3 +1,46 @@
 <resources>
-    <string name="app_name">Discipulado_IEADPE</string>
+    <string name="app_name">Discipulado IEADPE</string>
+
+    <string-array name="cargos_eclesiasticos">
+        <item>Presbítero</item>
+        <item>Diácono</item>
+        <item>Aux. de trabalho</item>
+        <item></item>
+    </string-array>
+
+    <string-array name="funcoes">
+        <item>Supervisor das campanhas</item>
+        <item>Vice-supervisor das campanhas</item>
+        <item>Coordenador do discipulado</item>
+        <item>Secretária da coordenação</item>
+        <item>Vice secretária da coordenação</item>
+        <item>Vice-coordenador do discipulado</item>
+        <item>Dirigente de campanha</item>
+        <item>Vice-dirigente de campanha</item>
+        <item>Professor do discipulado</item>
+        <item>secretária do discipulado</item>
+        <item>vice-secretária do discipulado</item>
+    </string-array>
+
+    <string-array name="congregacoes">
+        <item>Matriz</item>
+        <item>Canoas 2</item>
+        <item>Chafariz</item>
+        <item>R. da Liberdade</item>
+        <item>Usina Salgado</item>
+        <item>Zé Pojuca</item>
+        <item>Eng Mercês</item>
+        <item>Eng Dourado</item>
+        <item>Eng Caetés</item>
+        <item>Eng Água Fria</item>
+        <item>Eng Jiquí</item>
+        <item>Canoas 1</item>
+        <item>R. João Rufino</item>
+        <item>Eng Saco</item>
+        <item>Sítio Canoas 1</item>
+        <item>Sítio Canoas 2</item>
+        <item>Rua 22</item>
+        <item>Rua 32</item>
+        <item>Maracaípe</item>
+    </string-array>
 </resources>

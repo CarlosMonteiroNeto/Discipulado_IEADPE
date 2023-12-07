@@ -28,6 +28,9 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
         //TODO verificar informações de login recebidas pela activity,
         // definir o nível de acesso do usuário
         // e não carregar botões de editar e excluir contatos, a depender do nível de acesso.
+        // Imlementar oNClick de editar, enviando para AddMembroActivity com informações de contato no intent.
+        // Criar AlertDialog antes de excluir contatos.
+        // Caso confirmar, excluir do database e atualizar o RecyclerView.
 
     }
 
@@ -36,7 +39,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
         return contatos != null ? contatos.size() : 0;
     }
 
-    public void addItens (ArrayList<Contato> contatos){
+    public void atualizarItens(ArrayList<Contato> contatos){
         this.contatos = contatos;
         notifyDataSetChanged();
     }

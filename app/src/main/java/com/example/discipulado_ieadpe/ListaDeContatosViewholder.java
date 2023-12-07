@@ -15,7 +15,7 @@ public class ListaDeContatosViewholder extends RecyclerView.ViewHolder {
     public ListaDeContatosViewholder(@NonNull View itemView) {
         super(itemView);
 
-        cargoDoMembro = itemView.findViewById(R.id.cargo_do_membro);
+        cargoDoMembro = itemView.findViewById(R.id.cargo_eclesiastico);
         nomeDoMembro = itemView.findViewById(R.id.nome_do_membro);
         funcaoDoMembro = itemView.findViewById(R.id.funcao_do_membro);
         telefoneDoMembro = itemView.findViewById(R.id.telefone_do_membro);
