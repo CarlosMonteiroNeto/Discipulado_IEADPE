@@ -29,9 +29,7 @@ public class MainActivity extends AppCompatActivity {
         tituloBtnContatos = findViewById(R.id.titulo_btn_contatos);
         btnContatos = findViewById(R.id.btn_contatos);
 
-        btnContatos.setOnClickListener(view -> {
-            abrirListaDeContatos();
-        });
+        btnContatos.setOnClickListener(view -> abrirListaDeContatos());
     }
 
     private void abrirListaDeContatos(){
