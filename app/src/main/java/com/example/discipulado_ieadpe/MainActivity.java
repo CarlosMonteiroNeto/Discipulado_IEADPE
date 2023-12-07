@@ -62,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //TODO Criar registro de login e senha.
                 // Checar se confere. Salvar em Shared preferences.
+                //TODO condicionar as ações abaixo caso o login e senha existem e conferem.
+                // Caso contrário, dar avisos de não confere, senha incorreta etc.
+                if (checkSalvarLogin.isChecked()){
+                    editor.putBoolean(CHAVE_LOGIN_AUTOMATICO, true);
+                }
+                editor.apply();
+                startActivity(new Intent(MainActivity.this, TelaInicial.class));
                 // Salvar escolha de login automático.
             }
         });
