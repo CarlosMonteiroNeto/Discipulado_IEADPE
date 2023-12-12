@@ -8,7 +8,8 @@
         <item></item>
     </string-array>
 
-    <string-array name="funcoes">
+    <string-array name="funcoes_supervisor">
+        <item>Assistente de congregação</item>
         <item>Supervisor das campanhas</item>
         <item>Vice-supervisor das campanhas</item>
         <item>Coordenador do discipulado</item>
@@ -17,16 +18,28 @@
         <item>Vice-coordenador do discipulado</item>
         <item>Dirigente de campanha</item>
         <item>Vice-dirigente de campanha</item>
-        <item>Professor do discipulado</item>
+        <item>Professor(a) do discipulado</item>
         <item>secretária do discipulado</item>
         <item>vice-secretária do discipulado</item>
     </string-array>
 
-    <string-array name="congregacoes">
+    <string-array name="funcoes_congregacao">
+        <item>Dirigente de campanha</item>
+        <item>Vice-dirigente de campanha</item>
+        <item>Professor(a) do discipulado</item>
+        <item>secretária do discipulado</item>
+        <item>vice-secretária do discipulado</item>
+    </string-array>
+
+    <string-array name="usuarios">
         <item>Matriz</item>
+        <item>Canoas 1</item>
         <item>Canoas 2</item>
         <item>Chafariz</item>
+        <item>R. João Rufino</item>
         <item>R. da Liberdade</item>
+        <item>Rua 22</item>
+        <item>Rua 32</item>
         <item>Usina Salgado</item>
         <item>Zé Pojuca</item>
         <item>Eng Mercês</item>
@@ -34,13 +47,33 @@
         <item>Eng Caetés</item>
         <item>Eng Água Fria</item>
         <item>Eng Jiquí</item>
-        <item>Canoas 1</item>
-        <item>R. João Rufino</item>
         <item>Eng Saco</item>
         <item>Sítio Canoas 1</item>
         <item>Sítio Canoas 2</item>
-        <item>Rua 22</item>
-        <item>Rua 32</item>
         <item>Maracaípe</item>
+        <item>Supervisão</item>
     </string-array>
+    <string-array name="senhas">
+        <item>783294</item>
+        <item>451827</item>
+        <item>609348</item>
+        <item>872513</item>
+        <item>236974</item>
+        <item>548139</item>
+        <item>185326</item>
+        <item>397542</item>
+        <item>640752</item>
+        <item>918423</item>
+        <item>304875</item>
+        <item>769234</item>
+        <item>512376</item>
+        <item>897345</item>
+        <item>260948</item>
+        <item>432187</item>
+        <item>695843</item>
+        <item>123654</item>
+        <item>876342</item>
+        <item>57289346</item>
+    </string-array>
+
 </resources>

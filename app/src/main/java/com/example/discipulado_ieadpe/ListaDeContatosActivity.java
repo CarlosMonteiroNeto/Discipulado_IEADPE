@@ -48,6 +48,7 @@ public class ListaDeContatosActivity extends AppCompatActivity {
         listaDeContatosRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         listaDeContatosRecyclerView.setAdapter(adapter);
         listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        //TODO Precisa abrir outra Thread?
         viewModel.getContatos().observe(ListaDeContatosActivity.this, contatos -> adapter.atualizarItens(contatos));
 
         btnAddMembro.setOnClickListener(view -> abrirActivityDeEdicaoDeMembro());

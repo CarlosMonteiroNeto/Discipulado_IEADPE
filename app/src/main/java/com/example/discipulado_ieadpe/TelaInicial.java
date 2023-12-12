@@ -43,6 +43,7 @@ public class TelaInicial extends AppCompatActivity {
 
         btnSair.setOnClickListener(view -> {
             editor.putBoolean(MainActivity.CHAVE_LOGIN_AUTOMATICO, false);
+            editor.putString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO);
             editor.apply();
             startActivity(new Intent(TelaInicial.this, MainActivity.class));
         });

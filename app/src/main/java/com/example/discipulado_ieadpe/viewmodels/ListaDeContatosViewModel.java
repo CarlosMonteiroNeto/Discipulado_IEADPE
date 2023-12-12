@@ -7,21 +7,30 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.discipulado_ieadpe.database.entities.Contato;
-import com.example.discipulado_ieadpe.database.repositorios.ContatoRep;
+import com.example.discipulado_ieadpe.database.repositorios.RepositorioGeral;
 
 import java.util.ArrayList;
 
 public class ListaDeContatosViewModel extends AndroidViewModel {
 
 
-    private final ContatoRep contatoRep;
+    private final RepositorioGeral repositorioGeral;
     private final LiveData<ArrayList<Contato>> contatos;
+
     public ListaDeContatosViewModel(@NonNull Application application) {
         super(application);
-        contatoRep = new ContatoRep(this.getApplication());
-        contatos = contatoRep.carregarContatos();
+        repositorioGeral = new RepositorioGeral(this.getApplication());
+        contatos = repositorioGeral.carregarContatos();
     }
     public LiveData<ArrayList<Contato>> getContatos(){return contatos;}
 
-    public void addContato (Contato contato){contatoRep.addContato(contato);}
+    public void addContato (Contato contato){
+        repositorioGeral.addContato(contato);}
+
+    public int atualizarContato (Contato contato){
+        return repositorioGeral.atualizarContato(contato);
+    }
+    public void excluirContato (Contato contato){
+        repositorioGeral.deletarContato(contato);
+    }
 }

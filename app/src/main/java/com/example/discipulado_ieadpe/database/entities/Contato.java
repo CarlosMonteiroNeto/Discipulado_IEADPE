@@ -11,9 +11,6 @@ public class Contato {
     @ColumnInfo (name = "nome do membro")
     public String nomeDoMembro;
 
-    @ColumnInfo (name = "cargo eclesiástico")
-    public String cargoEclesiastico;
-
     @ColumnInfo (name = "função")
     public String funcao;
 
@@ -22,7 +19,4 @@ public class Contato {
 
     @ColumnInfo (name = "telefone")
     public int telefone;
-
-    @ColumnInfo (name = "senha")
-    public String senhaDeAcesso;
 }
