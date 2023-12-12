@@ -18,6 +18,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.discipulado_ieadpe.canarinho.validator.Validador;
+import com.example.discipulado_ieadpe.canarinho.watcher.MascaraNumericaTextWatcher;
+import com.example.discipulado_ieadpe.canarinho.watcher.TelefoneTextWatcher;
+import com.example.discipulado_ieadpe.canarinho.watcher.evento.EventoDeValidacao;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeContatosViewModel;
 
@@ -71,7 +75,22 @@ public class AddEditMembroActivity extends AppCompatActivity {
         tituloAddTelefone = findViewById(R.id.titulo_add_telefone);
         editAddNomeDoMembro = findViewById(R.id.edit_add_nome_do_membro);
         editAddTelefone = findViewById(R.id.edit_add_telefone);
-        editAddTelefone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
+        editAddTelefone.addTextChangedListener(new TelefoneTextWatcher(new EventoDeValidacao() {
+            @Override
+            public void invalido(String valorAtual, String mensagem) {
+
+            }
+
+            @Override
+            public void parcialmenteValido(String valorAtual) {
+
+            }
+
+            @Override
+            public void totalmenteValido(String valorAtual) {
+
+            }
+        }));
         btnConcluirAddEditMembro = findViewById(R.id.btn_add_edit_membro);
 
         btnConcluirAddEditMembro.setOnClickListener(v -> {
