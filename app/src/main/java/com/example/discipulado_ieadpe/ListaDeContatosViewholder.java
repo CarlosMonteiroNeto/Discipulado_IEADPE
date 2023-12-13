@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ListaDeContatosViewholder extends RecyclerView.ViewHolder {
 
-    public TextView cargoDoMembro, nomeDoMembro, funcaoDoMembro, telefoneDoMembro;
+    public TextView cargoDoMembro, nomeDoMembro, funcaoDoMembro, congregacaoDoMembro, telefoneDoMembro;
     public ImageButton btnLigar, btnAbrirWhatsapp, btnEditarMembro, btnExcluirMembro;
 
     public ListaDeContatosViewholder(@NonNull View itemView) {
         super(itemView);
 
-        cargoDoMembro = itemView.findViewById(R.id.cargo_eclesiastico);
         nomeDoMembro = itemView.findViewById(R.id.nome_do_membro);
         funcaoDoMembro = itemView.findViewById(R.id.funcao_do_membro);
+        congregacaoDoMembro = itemView.findViewById(R.id.congregacao_do_membro);
         telefoneDoMembro = itemView.findViewById(R.id.telefone_do_membro);
         btnLigar = itemView.findViewById(R.id.btn_ligar);
         btnAbrirWhatsapp = itemView.findViewById(R.id.btn_abrir_whatsapp);

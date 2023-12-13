@@ -56,4 +56,6 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation "androidx.room:room-paging:$room_version"
+
+    implementation 'io.github.vicmikhailau:MaskedEditText:5.0.1'
 }
