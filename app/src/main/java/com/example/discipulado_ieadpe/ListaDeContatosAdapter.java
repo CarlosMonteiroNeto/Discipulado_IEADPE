@@ -1,8 +1,9 @@
 package com.example.discipulado_ieadpe;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,9 @@ import java.util.Objects;
 public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatosViewholder> {
 
     private ArrayList <Contato> contatos;
-    private String usuarioLogado;
+    private final String usuarioLogado;
 
-    private ListaDeContatosViewModel viewModel;
+    private final ListaDeContatosViewModel viewModel;
     public ListaDeContatosAdapter(ArrayList<Contato> contatos, String usuarioLogado, ListaDeContatosViewModel viewModel){
         this.contatos = contatos;
         this.usuarioLogado = usuarioLogado;
@@ -57,6 +58,13 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
             holder.btnEditarMembro.setVisibility(View.INVISIBLE);
             holder.btnExcluirMembro.setVisibility(View.INVISIBLE);
         }
+
+        verificarWhatsApp(holder.btnAbrirWhatsapp, FormatadorTelefone.TELEFONE.desformata(holder.telefoneDoMembro.getText().toString()));
+
+        holder.btnLigar.setOnClickListener(view -> discarTelefone(view, FormatadorTelefone.TELEFONE.desformata(holder.telefoneDoMembro.getText().toString())));
+
+        holder.btnAbrirWhatsapp.setOnClickListener(view -> abrirConversaWhatsApp(view, FormatadorTelefone.TELEFONE.desformata(holder.telefoneDoMembro.getText().toString()), holder.nomeDoMembro.getText().toString()));
+
         holder.btnEditarMembro.setOnClickListener(view -> {
             Contato contatoAEditar = new Contato();
             contatoAEditar.nomeDoMembro = holder.nomeDoMembro.getText().toString();
@@ -78,7 +86,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
                 viewModel.excluirContato(contatoAExcluir);
             });
             dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> {
-                // Fecha o diálogo quando o botão "Cancelar" é pressionado
+                // Fecha o diálogo quando o botão "Não" é pressionado
                 dialogInterface.dismiss();
             });
             dialogBuilder.show();
@@ -93,5 +101,26 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
     public void atualizarItens (ArrayList < Contato > contatos) {
         this.contatos = contatos;
         notifyDataSetChanged();
+    }
+    public void discarTelefone(View view, String telefone) {
+
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + telefone));
+        view.getContext().startActivity(intent);
+    }
+
+    public void abrirConversaWhatsApp(View view, String telefone, String nomeDoContato) {
+        String mensagem = "A paz do Senhor, "+ nomeDoContato +"! Tudo bem?";
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("https://api.whatsapp.com/send?phone= +55" + telefone + "&text=" + mensagem));
+        view.getContext().startActivity(intent);
+    }
+    public void verificarWhatsApp(View view, String telefone) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("https://api.whatsapp.com/send?phone= +55" + telefone));
+        PackageManager packageManager = view.getContext().getPackageManager();
+        if (intent.resolveActivity(packageManager) == null) {
+            view.setVisibility(View.GONE);
+        }
     }
 }
