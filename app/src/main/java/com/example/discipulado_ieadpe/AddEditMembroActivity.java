@@ -143,13 +143,7 @@ public class AddEditMembroActivity extends AppCompatActivity {
                 });
                 dialogBuilder.show();
             }
-            new Thread(() -> {
-                if (listaDeContatos.stream().noneMatch(contato1 -> contato1.nomeDoMembro.equals(contatoNovo.nomeDoMembro))) {
-                    viewModel.addContato(contatoNovo);
-                } else {
-                    viewModel.atualizarContato(contatoNovo);
-                }
-            }).start();
+            new Thread(() -> viewModel.atualizarContato(contatoNovo)).start();
 
             finish();
         });
