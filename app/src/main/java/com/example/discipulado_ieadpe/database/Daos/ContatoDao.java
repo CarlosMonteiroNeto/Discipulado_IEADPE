@@ -10,6 +10,7 @@ import androidx.room.Update;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Dao
 public interface ContatoDao {
@@ -18,7 +19,7 @@ public interface ContatoDao {
     void inserirContato (Contato contato);
 
     @Query("SELECT * FROM contato")
-    LiveData<ArrayList<Contato>> carregarContatos();
+    LiveData<List<Contato>> carregarContatos();
 
     @Update
     int atualizarContato(Contato contato);

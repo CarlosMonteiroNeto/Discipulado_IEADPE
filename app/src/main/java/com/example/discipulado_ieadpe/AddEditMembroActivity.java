@@ -5,15 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.telephony.PhoneNumberFormattingTextWatcher;
-import android.text.format.Formatter;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -22,15 +18,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.discipulado_ieadpe.canarinho.validator.Validador;
-import com.example.discipulado_ieadpe.canarinho.watcher.MascaraNumericaTextWatcher;
-import com.example.discipulado_ieadpe.canarinho.watcher.TelefoneTextWatcher;
-import com.example.discipulado_ieadpe.canarinho.watcher.evento.EventoDeValidacao;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeContatosViewModel;
 import com.vicmikhailau.maskededittext.MaskedEditText;
-import com.vicmikhailau.maskededittext.MaskedFormatter;
-import com.vicmikhailau.maskededittext.MaskedWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,34 +33,37 @@ import java.util.stream.Collectors;
 // como através do botão de editar ao lado de um contato da lista, disponível apenas para usuários com permissão.
 // Neste segundo caso, vem os dados do contato junto com a intent, que preenchem automaticamente as views, bloqueando a edição do nome do contato.
 public class AddEditMembroActivity extends AppCompatActivity {
-
-    SharedPreferences loginPreferences;
-
-    TextView tituloNomeDoUsuario, tituloAddNomeDoMembro, tituloSpnCargo, tituloAddTelefone;
+    TextView tituloNomeDoUsuario, tituloAddNomeDoMembro, tituloSpnCargo, tituloAddTelefone, nomeDaCongregacao;
     Spinner spnCongregacao, spnCargo;
     EditText editAddNomeDoMembro;
     MaskedEditText editAddTelefone;
-
     Button btnConcluirAddEditMembro;
     ArrayAdapter<CharSequence> spnCargoAdapter;
-
     ListaDeContatosViewModel viewModel;
-    ArrayList<Contato> listaDeContatos;
+    List<Contato> listaDeContatos;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_editar_membro);
         viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
-        new Thread(() -> listaDeContatos = viewModel.getContatos().getValue()).start();
+        new Thread(() -> {
+            listaDeContatos = viewModel.getContatos().getValue();
+            if (listaDeContatos==null){
+//                Contato contatoVazio = new Contato();
+//                contatoVazio.nomeDoMembro = "Sem nome";
+                listaDeContatos=new ArrayList<>();
+            }
+        }).start();
 
-        loginPreferences = getSharedPreferences("Dados do login", Context.MODE_PRIVATE);
-        String usuarioLogado = loginPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO);
+        SharedPreferences sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
+        String usuarioLogado = sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO);
+        Log.d("ValorUsuarioLogado", usuarioLogado);
+        spnCongregacao = findViewById(R.id.spinner_congregacoes);
         if (!usuarioLogado.equals("Supervisão")){
             spnCongregacao.setVisibility(View.GONE);
             spnCargoAdapter = ArrayAdapter.createFromResource(this, R.array.funcoes_congregacao, android.R.layout.simple_spinner_item);
         } else {
-            spnCongregacao = findViewById(R.id.spinner_congregacoes);
             ArrayAdapter<CharSequence>spnCongregacaoAdapter = ArrayAdapter.createFromResource(this, R.array.usuarios, android.R.layout.simple_spinner_item);
             spnCongregacaoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spnCongregacao.setAdapter(spnCongregacaoAdapter);
@@ -109,14 +102,15 @@ public class AddEditMembroActivity extends AppCompatActivity {
                 }
                 return;
             }
-            Contato contato = new Contato();
-            contato.congregacao = (usuarioLogado.equals("Supervisão") ? spnCongregacao.getPrompt().toString() : tituloNomeDoUsuario.getText().toString());
-            contato.funcao = spnCargo.getPrompt().toString();
-            contato.nomeDoMembro = editAddNomeDoMembro.getText().toString();
-            contato.telefone = Integer.parseInt(Objects.requireNonNull(editAddTelefone.getUnMaskedText()));
+            Contato contatoNovo = new Contato();
+            contatoNovo.congregacao = (usuarioLogado.equals("Supervisão") ? spnCongregacao.getSelectedItem().toString() : tituloNomeDoUsuario.getText().toString());
+            contatoNovo.funcao = spnCargo.getSelectedItem().toString();
+            contatoNovo.nomeDoMembro = editAddNomeDoMembro.getText().toString();
+            contatoNovo.telefone = editAddTelefone.getUnMaskedText();
 
+            Log.d("Lista de contatos", listaDeContatos.stream().findFirst().get().nomeDoMembro);
             List<Contato> contatosPorCongregacao = listaDeContatos.stream()
-                    .filter(contatoGeral -> contatoGeral.congregacao.equals(contato.congregacao))
+                    .filter(contatoGeral -> contatoGeral.congregacao.equals(contatoNovo.congregacao))
                     .collect(Collectors.toList());
 
             ArrayList<String> cargosPorCongregacao = new ArrayList<>();
@@ -124,12 +118,12 @@ public class AddEditMembroActivity extends AppCompatActivity {
                 cargosPorCongregacao.add(contatoPorCongregacao.funcao);
             }
             // Garante que só há uma pessoa por cargo em cada congregação, exceto para professor, que pode haver vários.
-            if (!spnCargo.getPrompt().toString().equals("Professor(a) do discipulado")
-                    && cargosPorCongregacao.contains(spnCargo.getPrompt().toString())) {
+            if (!contatoNovo.funcao.equals("Professor(a) do discipulado")
+                    && cargosPorCongregacao.contains(contatoNovo.funcao)) {
 
                 Contato contatoAtualNaFuncao = new Contato();
                 for (Contato contatoAtual : contatosPorCongregacao) {
-                    if (contatoAtual.funcao.equals(spnCargo.getPrompt().toString())) {
+                    if (contatoAtual.funcao.equals(contatoNovo.funcao)) {
                         contatoAtualNaFuncao = contatoAtual;
                         break;
                     }
@@ -137,11 +131,11 @@ public class AddEditMembroActivity extends AppCompatActivity {
                 //Caso já haja alguém com esta função na congregação, possibilita excluir o membro antigo e logo após,
                 // adicionar ou atualizar o cargo do membro novo.
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-                dialogBuilder.setTitle("Já existe uma pessoa como " + spnCargo.getPrompt().toString());
+                dialogBuilder.setTitle("Já existe uma pessoa como " + contatoNovo.funcao);
                 dialogBuilder.setMessage("É " + contatoAtualNaFuncao.nomeDoMembro + ". Deseja alterar?");
                 Contato finalContatoAtualNaFuncao = contatoAtualNaFuncao;
                 dialogBuilder.setPositiveButton("Alterar", (dialog, which) -> {
-                    viewModel.excluirContato(finalContatoAtualNaFuncao);
+                    new Thread(() -> viewModel.excluirContato(finalContatoAtualNaFuncao)).start();
                 });
                 dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> {
                     // Fecha o diálogo quando o botão "Cancelar" é pressionado
@@ -149,11 +143,14 @@ public class AddEditMembroActivity extends AppCompatActivity {
                 });
                 dialogBuilder.show();
             }
-            if (listaDeContatos.stream().noneMatch(contato1 -> contato1.nomeDoMembro.equals(contato.nomeDoMembro))) {
-                viewModel.addContato(contato);
-            } else {
-                viewModel.atualizarContato(contato);
-            }
+            new Thread(() -> {
+                if (listaDeContatos.stream().noneMatch(contato1 -> contato1.nomeDoMembro.equals(contatoNovo.nomeDoMembro))) {
+                    viewModel.addContato(contatoNovo);
+                } else {
+                    viewModel.atualizarContato(contatoNovo);
+                }
+            }).start();
+
             finish();
         });
     }
@@ -167,7 +164,3 @@ public class AddEditMembroActivity extends AppCompatActivity {
         return matcher.matches();
     }
 }
-    //
-    // TODO Verificar se há dados de contato no intent. Ou seja, é uma edição e não uma adição.
-    //  Caso sim: extrair os dados do intent e preencher as views.
-    //  Bloquear a edição do nome do contato.

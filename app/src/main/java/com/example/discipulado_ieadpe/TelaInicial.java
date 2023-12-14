@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -19,13 +20,13 @@ public class TelaInicial extends AppCompatActivity {
     TextView titulobtnContatos;
     ImageButton btnContatos;
     Button btnSair;
-    SharedPreferences sharedPreferences;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getSharedPreferences("dados do login", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         setContentView(R.layout.tela_inicial);
@@ -43,8 +44,11 @@ public class TelaInicial extends AppCompatActivity {
 
         btnSair.setOnClickListener(view -> {
             editor.putBoolean(MainActivity.CHAVE_LOGIN_AUTOMATICO, false);
+            Log.d("Usuário na antes de voltar: ", sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO));
             editor.putString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO);
+            Log.d("Usuário após putstring: ", sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO));
             editor.apply();
+            Log.d("Usuário após apply: ", sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO));
             startActivity(new Intent(TelaInicial.this, MainActivity.class));
         });
     }

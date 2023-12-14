@@ -1,51 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical|end">
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/nome_do_membro"/>
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/funcao_do_membro"/>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/congregacao_do_membro"/>
+            <!-- Nome do Membro -->
+            <TextView
+                android:id="@+id/nome_do_membro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Nome do Membro"
+                android:layout_weight="1"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/telefone_do_membro"/>
+            <!-- Função do Membro -->
+            <TextView
+                android:id="@+id/funcao_do_membro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Função"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"/>
 
-    <ImageButton
-        android:id="@+id/btn_ligar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_call" />
+            <!-- Congregação do Membro -->
+            <TextView
+                android:id="@+id/congregacao_do_membro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Congregação"
+                android:layout_weight="1"/>
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_abrir_whatsapp"/>
+            <!-- Telefone do Membro -->
+            <TextView
+                android:id="@+id/telefone_do_membro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="Telefone"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"/>
 
-    <ImageButton
-        android:id="@+id/btn_editar_membro"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_edit" />
+            <!-- Botão Ligar -->
+            <ImageButton
+                android:id="@+id/btn_ligar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@android:drawable/ic_menu_call" />
 
-    <ImageButton
-        android:id="@+id/btn_excluir_membro"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_delete" />
+            <!-- Botão Abrir WhatsApp -->
+            <ImageButton
+                android:id="@+id/btn_abrir_whatsapp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                />
+            <!--    android:src="@drawable/whatsapp_icon"-->
 
-</RelativeLayout>
+            <!-- Botão Editar Membro -->
+            <ImageButton
+                android:id="@+id/btn_editar_membro"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@android:drawable/ic_menu_edit" />
+
+            <!-- Botão Excluir Membro -->
+            <ImageButton
+                android:id="@+id/btn_excluir_membro"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@android:drawable/ic_menu_delete" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

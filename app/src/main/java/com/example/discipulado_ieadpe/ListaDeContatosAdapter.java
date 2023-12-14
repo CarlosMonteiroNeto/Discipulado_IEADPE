@@ -16,11 +16,12 @@ import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeContatosViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatosViewholder> {
 
-    private ArrayList <Contato> contatos;
+    private List<Contato> contatos;
     private final String usuarioLogado;
 
     private final ListaDeContatosViewModel viewModel;
@@ -70,7 +71,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
             contatoAEditar.nomeDoMembro = holder.nomeDoMembro.getText().toString();
             contatoAEditar.funcao = holder.funcaoDoMembro.getText().toString();
             contatoAEditar.congregacao = holder.congregacaoDoMembro.getText().toString();
-            contatoAEditar.telefone = Integer.parseInt(FormatadorTelefone.TELEFONE.desformata(holder.telefoneDoMembro.getText().toString()));
+            contatoAEditar.telefone = FormatadorTelefone.TELEFONE.desformata(holder.telefoneDoMembro.getText().toString());
             Intent intent = new Intent(view.getContext(), AddEditMembroActivity.class);
             intent.putExtra(ListaDeContatosActivity.CHAVE_INTENT_DADOS_DO_MEMBRO, contatoAEditar);
             view.getContext().startActivity(intent);
@@ -83,7 +84,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
             dialogBuilder.setPositiveButton("Sim", (dialog, which) -> {
                 Contato contatoAExcluir = new Contato();
                 contatoAExcluir.nomeDoMembro = holder.nomeDoMembro.getText().toString();
-                viewModel.excluirContato(contatoAExcluir);
+                new Thread(() -> viewModel.excluirContato(contatoAExcluir)).start();
             });
             dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> {
                 // Fecha o diálogo quando o botão "Não" é pressionado
@@ -98,7 +99,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
         return contatos != null ? contatos.size() : 0;
     }
 
-    public void atualizarItens (ArrayList < Contato > contatos) {
+    public void atualizarItens (List < Contato > contatos) {
         this.contatos = contatos;
         notifyDataSetChanged();
     }

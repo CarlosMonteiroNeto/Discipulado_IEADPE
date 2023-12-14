@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ListaDeContatosViewholder extends RecyclerView.ViewHolder {
 
-    public TextView cargoDoMembro, nomeDoMembro, funcaoDoMembro, congregacaoDoMembro, telefoneDoMembro;
+    public TextView nomeDoMembro, funcaoDoMembro, congregacaoDoMembro, telefoneDoMembro;
     public ImageButton btnLigar, btnAbrirWhatsapp, btnEditarMembro, btnExcluirMembro;
 
     public ListaDeContatosViewholder(@NonNull View itemView) {

@@ -1,5 +1,6 @@
 package com.example.discipulado_ieadpe.database.entities;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 public class Contato implements Serializable {
 
     @PrimaryKey
+    @NonNull
     @ColumnInfo (name = "nome do membro")
     public String nomeDoMembro;
 
@@ -20,5 +22,5 @@ public class Contato implements Serializable {
     public String congregacao;
 
     @ColumnInfo (name = "telefone")
-    public int telefone;
+    public String telefone;
 }

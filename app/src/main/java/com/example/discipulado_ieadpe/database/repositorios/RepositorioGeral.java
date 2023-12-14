@@ -8,6 +8,7 @@ import com.example.discipulado_ieadpe.database.AppDatabase;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RepositorioGeral {
 
@@ -16,7 +17,7 @@ public class RepositorioGeral {
         db = AppDatabase.getDatabase(context);
     }
 
-    public LiveData<ArrayList<Contato>> carregarContatos(){
+    public LiveData<List<Contato>> carregarContatos(){
         return db.contatoDao().carregarContatos();
     }
     public void addContato (Contato contato){

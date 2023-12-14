@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,26 +29,17 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter <CharSequence> loginAdapter;
     CheckBox checkSalvarLogin;
     Button btnLogin;
-
-    //TODO Criar link de primeiro acesso,
-    // que trasfere para um fragment,
-    // que verifica o nome de usuário cadastrado pela coordenação,
-    // pede criação e confirmação de senha,
-    // salva senha do usuário,
-    // retorna para MainActivity
-    // e exibe informação "faça login agora"
     ImageButton btnContatos;
     public static String CHAVE_USUARIO = "CHAVE_USUARIO";
     public static String CHAVE_LOGIN_AUTOMATICO = "CHAVE_LOGIN_AUTOMATICO";
-    public static String USUARIO_PADRAO = "";
+    public static String USUARIO_PADRAO = "Testando";
     public static boolean LOGIN_AUTOMATICO_PADRAO = false;
-    public SharedPreferences sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
-    public SharedPreferences.Editor editor = sharedPreferences.edit();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        SharedPreferences sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         if (sharedPreferences.getBoolean(CHAVE_LOGIN_AUTOMATICO, LOGIN_AUTOMATICO_PADRAO)){
             startActivity(new Intent(this, TelaInicial.class));
         }
@@ -76,12 +68,14 @@ public class MainActivity extends AppCompatActivity {
                 if (!senhaFornecida.equals(senhaCorreta)){
                     editSenha.setError("Senha incorreta");
                 } else {
-                    String usuarioSelecionado = spnLogin.getPrompt().toString();
+                    String usuarioSelecionado = spnLogin.getSelectedItem().toString();
                     editor.putString(CHAVE_USUARIO, usuarioSelecionado);
+                    Log.d("Usuário após putstring", sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO));
                     if (checkSalvarLogin.isChecked()){
                         editor.putBoolean(CHAVE_LOGIN_AUTOMATICO, true);
                     }
                     editor.apply();
+                    Log.d("Usuário após apply", sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO));
                     startActivity(new Intent(MainActivity.this, TelaInicial.class));
                 }
             }
