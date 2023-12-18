@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,7 +44,7 @@ public class ListaDeContatosActivity extends AppCompatActivity {
         legendaBtnAddMembro = findViewById(R.id.sub_btn_add_membro);
         btnAddMembro = findViewById(R.id.btn_add_membro);
 
-        sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(MainActivity.DADOS_DE_LOGIN, Context.MODE_PRIVATE);
         String usuarioLogado = sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO);
         Log.d("Usuário Logado", usuarioLogado);
         if (Objects.equals(usuarioLogado, MainActivity.USUARIO_PADRAO)) {
@@ -57,8 +58,18 @@ public class ListaDeContatosActivity extends AppCompatActivity {
         listaDeContatosRecyclerView.setAdapter(adapter);
         listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        viewModel.getContatos().observe(ListaDeContatosActivity.this, contatos -> adapter.atualizarItens(contatos));
-
+        viewModel.getContatos().observe(ListaDeContatosActivity.this, contatos -> {
+            if (contatos != null){
+                adapter.atualizarItens(contatos);
+            } else {
+                Toast.makeText(getApplicationContext(), "Houve um erro ao obter os contatos. tente novamente.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        viewModel.getMensagemDeExclusao().observe(this, mensagem ->{
+            if (mensagem != null) {
+                Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
+            }
+        });
         btnAddMembro.setOnClickListener(view -> abrirActivityDeEdicaoDeMembro());
     }
 

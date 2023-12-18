@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -26,7 +25,7 @@ public class TelaInicial extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.DADOS_DE_LOGIN, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         setContentView(R.layout.tela_inicial);
@@ -34,12 +33,9 @@ public class TelaInicial extends AppCompatActivity {
         btnContatos = findViewById(R.id.btn_contatos);
         btnSair = findViewById(R.id.btn_sair);
 
-        btnContatos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(TelaInicial.this, ListaDeContatosActivity.class);
-                startActivity(intent);
-            }
+        btnContatos.setOnClickListener(view -> {
+            Intent intent = new Intent(TelaInicial.this, ListaDeContatosActivity.class);
+            startActivity(intent);
         });
 
         btnSair.setOnClickListener(view -> {

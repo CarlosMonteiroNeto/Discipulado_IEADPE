@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 // como através do botão de editar ao lado de um contato da lista, disponível apenas para usuários com permissão.
 // Neste segundo caso, vem os dados do contato junto com a intent, que preenchem automaticamente as views, bloqueando a edição do nome do contato.
 public class AddEditMembroActivity extends AppCompatActivity {
-    TextView tituloNomeDoUsuario, tituloAddNomeDoMembro, tituloSpnCargo, tituloAddTelefone, nomeDaCongregacao;
+    TextView tituloNomeDoUsuario, tituloAddNomeDoMembro, tituloSpnCargo, tituloAddTelefone;
     Spinner spnCongregacao, spnCargo;
     EditText editAddNomeDoMembro;
     MaskedEditText editAddTelefone;
@@ -47,14 +48,12 @@ public class AddEditMembroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_editar_membro);
         viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
-        new Thread(() -> {
-            listaDeContatos = viewModel.getContatos().getValue();
+        listaDeContatos = viewModel.getContatos().getValue();
             if (listaDeContatos==null){
 //                Contato contatoVazio = new Contato();
 //                contatoVazio.nomeDoMembro = "Sem nome";
                 listaDeContatos=new ArrayList<>();
             }
-        }).start();
 
         SharedPreferences sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
         String usuarioLogado = sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO);
@@ -82,6 +81,7 @@ public class AddEditMembroActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent.getSerializableExtra(ListaDeContatosActivity.CHAVE_INTENT_DADOS_DO_MEMBRO)!= null){
             Contato contatoAEditar = (Contato) intent.getSerializableExtra(ListaDeContatosActivity.CHAVE_INTENT_DADOS_DO_MEMBRO);
+            assert contatoAEditar != null;
             editAddTelefone.setText(contatoAEditar.telefone);
             editAddNomeDoMembro.setText(contatoAEditar.nomeDoMembro);
             editAddNomeDoMembro.setFocusable(false); // Impede o foco
@@ -93,7 +93,7 @@ public class AddEditMembroActivity extends AppCompatActivity {
 
         btnConcluirAddEditMembro.setOnClickListener(v -> {
             if (editAddNomeDoMembro.getText().toString().trim().isEmpty()
-                    || !numeroCelularEhValido(Objects.requireNonNull(editAddTelefone.getText()).toString())){
+                    || numeroCelularEhValido(Objects.requireNonNull(editAddTelefone.getText()).toString())){
                 if (editAddNomeDoMembro.getText().toString().trim().isEmpty()){
                     editAddNomeDoMembro.setError("Insira um nome");
                 }
@@ -113,10 +113,12 @@ public class AddEditMembroActivity extends AppCompatActivity {
                     .filter(contatoGeral -> contatoGeral.congregacao.equals(contatoNovo.congregacao))
                     .collect(Collectors.toList());
 
-            ArrayList<String> cargosPorCongregacao = new ArrayList<>();
-            for (Contato contatoPorCongregacao : contatosPorCongregacao) {
-                cargosPorCongregacao.add(contatoPorCongregacao.funcao);
-            }
+            List<String> cargosPorCongregacao = contatosPorCongregacao
+                    .stream()
+                    .map(contatoPorCongregacao -> contatoPorCongregacao.funcao)
+                    .distinct()
+                    .collect(Collectors.toList());
+
             // Garante que só há uma pessoa por cargo em cada congregação, exceto para professor, que pode haver vários.
             if (!contatoNovo.funcao.equals("Professor(a) do discipulado")
                     && cargosPorCongregacao.contains(contatoNovo.funcao)) {
@@ -135,17 +137,25 @@ public class AddEditMembroActivity extends AppCompatActivity {
                 dialogBuilder.setMessage("É " + contatoAtualNaFuncao.nomeDoMembro + ". Deseja alterar?");
                 Contato finalContatoAtualNaFuncao = contatoAtualNaFuncao;
                 dialogBuilder.setPositiveButton("Alterar", (dialog, which) -> {
-                    new Thread(() -> viewModel.excluirContato(finalContatoAtualNaFuncao)).start();
+                    viewModel.deletarContato(finalContatoAtualNaFuncao);
+                    // O método addContato retorna uma mensagem de sucesso ou erro.
+                    // Caso seja de erro fecha o dialog sem fechar a activity
+                    viewModel.addContato(contatoNovo).observe(this, mensagem ->{
+                        if (mensagem!=null){
+                            Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_SHORT).show();
+                            if(mensagem.startsWith("Erro")){
+                                dialog.dismiss();
+                            }
+                        }
+                        finish();
+                    });
                 });
-                dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> {
-                    // Fecha o diálogo quando o botão "Cancelar" é pressionado
-                    dialogInterface.dismiss();
+                dialogBuilder.setNegativeButton("Não", (dialog, i) -> {
+                    // Fecha o dialog quando o botão "Cancelar" é pressionado
+                    dialog.dismiss();
                 });
                 dialogBuilder.show();
             }
-            new Thread(() -> viewModel.atualizarContato(contatoNovo)).start();
-
-            finish();
         });
     }
     public boolean numeroCelularEhValido (String numero) {
@@ -155,6 +165,6 @@ public class AddEditMembroActivity extends AppCompatActivity {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(numero);
 
-        return matcher.matches();
+        return !matcher.matches();
     }
 }

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -15,10 +14,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,15 +25,16 @@ public class MainActivity extends AppCompatActivity {
     CheckBox checkSalvarLogin;
     Button btnLogin;
     ImageButton btnContatos;
+    public static String DADOS_DE_LOGIN = "Dados de login";
     public static String CHAVE_USUARIO = "CHAVE_USUARIO";
     public static String CHAVE_LOGIN_AUTOMATICO = "CHAVE_LOGIN_AUTOMATICO";
-    public static String USUARIO_PADRAO = "Testando";
+    public static String USUARIO_PADRAO = "";
     public static boolean LOGIN_AUTOMATICO_PADRAO = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getSharedPreferences("dados de login", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(DADOS_DE_LOGIN, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (sharedPreferences.getBoolean(CHAVE_LOGIN_AUTOMATICO, LOGIN_AUTOMATICO_PADRAO)){
             startActivity(new Intent(this, TelaInicial.class));

@@ -23,8 +23,9 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
 
     private List<Contato> contatos;
     private final String usuarioLogado;
-
+//    private ContatoDeleteListener contatoDeleteListener;
     private final ListaDeContatosViewModel viewModel;
+
     public ListaDeContatosAdapter(ArrayList<Contato> contatos, String usuarioLogado, ListaDeContatosViewModel viewModel){
         this.contatos = contatos;
         this.usuarioLogado = usuarioLogado;
@@ -82,9 +83,11 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
             dialogBuilder.setTitle("Atenção!");
             dialogBuilder.setMessage("Deseja excluir " + holder.nomeDoMembro.getText().toString() + " da equipe?");
             dialogBuilder.setPositiveButton("Sim", (dialog, which) -> {
-                Contato contatoAExcluir = new Contato();
-                contatoAExcluir.nomeDoMembro = holder.nomeDoMembro.getText().toString();
-                new Thread(() -> viewModel.excluirContato(contatoAExcluir)).start();
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION){
+                    Contato contatoAExcluir = contatos.get(adapterPosition);
+                    viewModel.deletarContato(contatoAExcluir);
+                }
             });
             dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> {
                 // Fecha o diálogo quando o botão "Não" é pressionado
