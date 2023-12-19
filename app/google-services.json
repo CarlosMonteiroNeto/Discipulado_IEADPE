@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "811920591827",
+    "project_id": "discipulado-ieadpe",
+    "storage_bucket": "discipulado-ieadpe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811920591827:android:a3910db43b0cf74c9e3d26",
+        "android_client_info": {
+          "package_name": "com.example.discipulado_ieadpe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe1AzVE9SxuZhMJAEwgVXSqsGZmmGmirY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
