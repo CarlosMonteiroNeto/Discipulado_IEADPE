@@ -17,14 +17,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_lista_de_contatos"
-        android:layout_width="400dp"
-        android:layout_height="364dp"
-        android:layout_marginTop="1dp"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titulo_lista_de_contatos" />
+        app:layout_constraintTop_toBottomOf="@+id/titulo_lista_de_contatos">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_lista_de_contatos"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="1dp"
+             />
+
+    </HorizontalScrollView>
+
 
     <ImageButton
         android:id="@+id/btn_add_membro"

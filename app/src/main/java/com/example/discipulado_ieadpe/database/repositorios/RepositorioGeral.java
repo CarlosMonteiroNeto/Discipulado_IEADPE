@@ -1,10 +1,18 @@
 package com.example.discipulado_ieadpe.database.repositorios;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.example.discipulado_ieadpe.database.entities.Contato;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,14 +29,18 @@ public class RepositorioGeral {
 
     public LiveData<List<Contato>> carregarContatos(){
         MutableLiveData<List<Contato>> contatos = new MutableLiveData<>();
-        db.collection(MEMBROS_DA_EQUIPE).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            List<Contato> listaDeContatos = new ArrayList<>();
-            for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots) {
-                Contato contato = documentSnapshot.toObject(Contato.class);
-                listaDeContatos.add(contato);
+        db.collection(MEMBROS_DA_EQUIPE).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    List<Contato> listaContatos = new ArrayList<>();
+                    for (QueryDocumentSnapshot document: task.getResult()){
+                        Contato contato = document.toObject(Contato.class);
+                        listaContatos.add(contato);
+                    }
+                    contatos.setValue(listaContatos);
+                }
             }
-            contatos.setValue(listaDeContatos);
-        }).addOnFailureListener(e -> {
         });
         return contatos;
     }
@@ -38,15 +50,21 @@ public class RepositorioGeral {
         MutableLiveData<String> mensagemParaUsuario = new MutableLiveData<>();
 
         Map<String, Object> membro = new HashMap<>();
-        membro.put("Nome", contato.nomeDoMembro);
-        membro.put("Função", contato.funcao);
-        membro.put("Congregação", contato.congregacao);
-        membro.put("Telefone", contato.telefone);
+        membro.put("nomeDoMembro", contato.getNomeDoMembro());
+        membro.put("funcao", contato.getFuncao());
+        membro.put("congregacao", contato.getCongregacao());
+        membro.put("telefone", contato.getTelefone());
 
         db.collection(MEMBROS_DA_EQUIPE)
-                .document(contato.nomeDoMembro).set(membro)
-                .addOnSuccessListener(unused -> mensagemParaUsuario.setValue("Contato adicionado com sucesso"))
-                .addOnFailureListener(e -> mensagemParaUsuario.setValue("Erro: " + e.getMessage()));
+                .document(contato.getNomeDoMembro()).set(membro)
+                .addOnSuccessListener(unused -> {
+                    mensagemParaUsuario.setValue("Contato adicionado com sucesso");
+                    Log.d("Sucesso ao add", "DocumentSnapshot added");
+                })
+                .addOnFailureListener(e -> {
+                    mensagemParaUsuario.setValue("Erro: " + e.getMessage());
+                    Log.w("Falha ao add", "Error adding document", e);
+                });
         return mensagemParaUsuario;
     }
 //    public int atualizarContato (Contato contato){
@@ -55,7 +73,7 @@ public class RepositorioGeral {
 
     public void deletarContato (Contato contato, MutableLiveData<String> mensagemParaUsuario){
 
-        db.collection(MEMBROS_DA_EQUIPE).document(contato.nomeDoMembro)
+        db.collection(MEMBROS_DA_EQUIPE).document(contato.getNomeDoMembro())
                 .delete()
                 .addOnSuccessListener(aVoid -> mensagemParaUsuario.setValue("Membro excluído com sucesso"))
                 .addOnFailureListener(e -> mensagemParaUsuario.setValue("Erro: " +e.getMessage()));

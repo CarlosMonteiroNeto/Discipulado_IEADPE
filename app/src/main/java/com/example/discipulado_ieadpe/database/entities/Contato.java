@@ -10,17 +10,50 @@ import java.io.Serializable;
 @Entity (tableName = "contato")
 public class Contato implements Serializable {
 
+    public Contato(){}
+
     @PrimaryKey
     @NonNull
     @ColumnInfo (name = "nome do membro")
-    public String nomeDoMembro;
+    private String nomeDoMembro;
+
+    @NonNull
+    public String getNomeDoMembro() {
+        return nomeDoMembro;
+    }
+    public void setNomeDoMembro(@NonNull String nomeDoMembro) {
+        this.nomeDoMembro = nomeDoMembro;
+    }
 
     @ColumnInfo (name = "função")
-    public String funcao;
+    private String funcao;
+
+    public String getFuncao() {
+        return funcao;
+    }
+
+    public void setFuncao(String funcao) {
+        this.funcao = funcao;
+    }
 
     @ColumnInfo (name = "congregação")
-    public String congregacao;
+    private String congregacao;
+
+    public String getCongregacao() {
+        return congregacao;
+    }
+    public void setCongregacao(String congregacao) {
+        this.congregacao = congregacao;
+    }
 
     @ColumnInfo (name = "telefone")
-    public String telefone;
+    private String telefone;
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
 }

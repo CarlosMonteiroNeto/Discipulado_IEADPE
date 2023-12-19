@@ -39,7 +39,7 @@ public class ListaDeContatosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lista_de_contatos_activity);
 
-        viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
+//        viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
         tituloListaDeContatos = findViewById(R.id.titulo_lista_de_contatos);
         legendaBtnAddMembro = findViewById(R.id.sub_btn_add_membro);
         btnAddMembro = findViewById(R.id.btn_add_membro);
@@ -51,28 +51,22 @@ public class ListaDeContatosActivity extends AppCompatActivity {
             btnAddMembro.setVisibility(View.INVISIBLE);
             legendaBtnAddMembro.setVisibility(View.INVISIBLE);
         }
-
-        listaDeContatosRecyclerView = findViewById(R.id.recyclerview_lista_de_contatos);
-        adapter = new ListaDeContatosAdapter(new ArrayList<>(), usuarioLogado, viewModel);
-        listaDeContatosRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        listaDeContatosRecyclerView.setAdapter(adapter);
-        listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        viewModel.getContatos().observe(ListaDeContatosActivity.this, contatos -> {
-            if (contatos != null){
-                adapter.atualizarItens(contatos);
-            } else {
-                Toast.makeText(getApplicationContext(), "Houve um erro ao obter os contatos. tente novamente.", Toast.LENGTH_SHORT).show();
-            }
-        });
-        viewModel.getMensagemDeExclusao().observe(this, mensagem ->{
+        viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
+        viewModel.getContatos().observe(ListaDeContatosActivity.this, contatos -> adapter.atualizarItens(contatos));
+        viewModel.getMensagemDeExclusao().observe(ListaDeContatosActivity.this, mensagem -> {
             if (mensagem != null) {
                 Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
             }
         });
+        listaDeContatosRecyclerView = findViewById(R.id.recyclerview_lista_de_contatos);
+        adapter = new ListaDeContatosAdapter(new ArrayList<>(), usuarioLogado, viewModel);
+        listaDeContatosRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        listaDeContatosRecyclerView.setAdapter(adapter);
+        listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
+
         btnAddMembro.setOnClickListener(view -> abrirActivityDeEdicaoDeMembro());
     }
-
     private void abrirActivityDeEdicaoDeMembro(){
         startActivity(new Intent(this, AddEditMembroActivity.class));
     }
