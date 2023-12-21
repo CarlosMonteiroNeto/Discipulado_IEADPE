@@ -9,16 +9,16 @@
 
         <TextView
             android:id="@+id/nome_do_membro"
-            android:layout_width="200dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/funcao_do_membro"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="@color/black"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"/>
@@ -27,7 +27,7 @@
             android:id="@+id/congregacao_do_membro"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="@color/black"
             />
 
@@ -35,33 +35,33 @@
             android:id="@+id/telefone_do_membro"
             android:layout_width="128dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="@color/black"
             android:layout_marginStart="8dp"/>
 
         <ImageButton
             android:id="@+id/btn_ligar"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@android:drawable/ic_menu_call" />
 
         <ImageButton
             android:id="@+id/btn_abrir_whatsapp"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="@drawable/ic_whatsapp"
             />
 
         <ImageButton
             android:id="@+id/btn_editar_membro"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@android:drawable/ic_menu_edit" />
 
         <ImageButton
             android:id="@+id/btn_excluir_membro"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@android:drawable/ic_menu_delete" />
 
     </LinearLayout>

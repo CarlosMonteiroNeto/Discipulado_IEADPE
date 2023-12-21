@@ -1,5 +1,6 @@
 package com.example.discipulado_ieadpe;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeContatosViewModel;
@@ -44,14 +46,8 @@ public class AddEditMembroActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_editar_membro);
-        viewModel = new ViewModelProvider(AddEditMembroActivity.this).get(ListaDeContatosViewModel.class);
-        viewModel.getContatos().observe(AddEditMembroActivity.this, contatos -> listaDeContatos = contatos);
-//            if (listaDeContatos==null){
-////                Contato contatoVazio = new Contato();
-////                contatoVazio.nomeDoMembro = "Sem nome";
-//                listaDeContatos=new ArrayList<>();
-//            }
-
+        viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
+        viewModel.getContatos().observe(this, contatos -> listaDeContatos = contatos);
         SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.DADOS_DE_LOGIN, Context.MODE_PRIVATE);
         String usuarioLogado = sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO);
         Log.d("ValorUsuarioLogado", usuarioLogado);
@@ -104,63 +100,64 @@ public class AddEditMembroActivity extends AppCompatActivity {
             contatoNovo.setFuncao(spnCargo.getSelectedItem().toString());
             contatoNovo.setNomeDoMembro(editAddNomeDoMembro.getText().toString());
             contatoNovo.setTelefone(maskedEditAddTelefone.getText().toString());
+//            viewModel.getContatos().observe(this, contatos -> {
+//                listaDeContatos = contatos;
+                List<Contato> contatosPorCongregacao = listaDeContatos.stream()
+                        .filter(contatoGeral -> contatoGeral.getCongregacao().equals(contatoNovo.getCongregacao()))
+                        .collect(Collectors.toList());
 
-            List<Contato> contatosPorCongregacao = listaDeContatos.stream()
-                    .filter(contatoGeral -> contatoGeral.getCongregacao().equals(contatoNovo.getCongregacao()))
-                    .collect(Collectors.toList());
-
-            List<String> cargosPorCongregacao = contatosPorCongregacao
-                    .stream()
-                    .map(contatoPorCongregacao -> contatoPorCongregacao.getFuncao())
-                    .distinct()
-                    .collect(Collectors.toList());
-            // Garante que só há uma pessoa por cargo em cada congregação, exceto para professor, que pode haver vários.
-            if (!contatoNovo.getFuncao().equals("Professor(a) do discipulado")
-                    && cargosPorCongregacao.contains(contatoNovo.getFuncao())) {
+                List<String> cargosPorCongregacao = contatosPorCongregacao
+                        .stream()
+                        .map(Contato::getFuncao)
+                        .distinct()
+                        .collect(Collectors.toList());
+                if (!contatoNovo.getFuncao().equals("Professor(a) do discipulado")
+                        && cargosPorCongregacao.contains(contatoNovo.getFuncao())) {
 
 
-                Contato contatoAtualNaFuncao = new Contato();
-                for (Contato contatoAtual : contatosPorCongregacao) {
-                    if (contatoAtual.getFuncao().equals(contatoNovo.getFuncao())) {
-                        contatoAtualNaFuncao = contatoAtual;
-                        break;
+                    Contato contatoAtualNaFuncao = new Contato();
+                    for (Contato contatoAtual : contatosPorCongregacao) {
+                        if (contatoAtual.getFuncao().equals(contatoNovo.getFuncao())) {
+                            contatoAtualNaFuncao = contatoAtual;
+                            break;
+                        }
                     }
+                    //Caso já haja alguém com esta função na congregação, possibilita excluir o membro antigo e logo após,
+                    // adicionar ou atualizar o cargo do membro novo.
+                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                    dialogBuilder.setTitle("Já existe uma pessoa como " + contatoNovo.getFuncao());
+                    dialogBuilder.setMessage("É " + contatoAtualNaFuncao.getNomeDoMembro() + ". Deseja alterar?");
+                    Contato finalContatoAtualNaFuncao = contatoAtualNaFuncao;
+                    dialogBuilder.setPositiveButton("Alterar", (dialog, which) -> {
+                        viewModel.deletarContato(finalContatoAtualNaFuncao);
+                        // O método addContato retorna uma mensagem de sucesso ou erro.
+                        // Caso seja de erro fecha o dialog sem fechar a activity
+                        addContatoERetornarMensagem(contatoNovo);
+                    });
+                    dialogBuilder.setNegativeButton("Não", (dialog, i) -> {
+                        // Fecha o dialog quando o botão "Cancelar" é pressionado
+                        dialog.dismiss();
+                    });
+                    dialogBuilder.show();
+                } else {
+                    addContatoERetornarMensagem(contatoNovo);
                 }
-                //Caso já haja alguém com esta função na congregação, possibilita excluir o membro antigo e logo após,
-                // adicionar ou atualizar o cargo do membro novo.
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-                dialogBuilder.setTitle("Já existe uma pessoa como " + contatoNovo.getFuncao());
-                dialogBuilder.setMessage("É " + contatoAtualNaFuncao.getNomeDoMembro() + ". Deseja alterar?");
-                Contato finalContatoAtualNaFuncao = contatoAtualNaFuncao;
-                dialogBuilder.setPositiveButton("Alterar", (dialog, which) -> {
-                    viewModel.deletarContato(finalContatoAtualNaFuncao);
-                    // O método addContato retorna uma mensagem de sucesso ou erro.
-                    // Caso seja de erro fecha o dialog sem fechar a activity
-                    viewModel.addContato(contatoNovo);
-//                            .observe(this, mensagem -> {
-//                        if (mensagem != null) {
-//                            Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-                    finish();
-                });
-                dialogBuilder.setNegativeButton("Não", (dialog, i) -> {
-                    // Fecha o dialog quando o botão "Cancelar" é pressionado
-                    dialog.dismiss();
-                });
-                dialogBuilder.show();
-            }
-            else {
-                viewModel.addContato(contatoNovo);
-//                        .observe(this, mensagem -> {
-//                    if (mensagem != null) {
-//                        Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-                finish();
-            }
+//            });
+            // Garante que só há uma pessoa por cargo em cada congregação, exceto para professor, que pode haver vários.
+
         });
-        }
+    }
+    private void addContatoERetornarMensagem(Contato contatoNovo){
+        viewModel.addContato(contatoNovo);
+//        if (Objects.requireNonNull(mensagem.getValue()).startsWith("Erro")) {
+//            Toast.makeText(getApplicationContext(), mensagem.getValue(), Toast.LENGTH_SHORT).show();
+//        } else {
+//            Intent resultIntent = new Intent();
+//            resultIntent.putExtra("mensagem de sucesso", mensagem.getValue());
+//            setResult(Activity.RESULT_OK, resultIntent);
+            finish();
+//        }
+    }
     public boolean numeroCelularEhValido (String numero) {
         // Expressão regular para validar números de celular brasileiros
         String regex = "^\\([1-9]{2}\\)\\s9\\s[6-9]{1}[0-9]{3}\\-[0-9]{4}$";

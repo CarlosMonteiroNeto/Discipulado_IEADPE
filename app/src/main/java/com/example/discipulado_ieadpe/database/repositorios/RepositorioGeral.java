@@ -27,19 +27,16 @@ public class RepositorioGeral {
         db = FirebaseFirestore.getInstance();
     }
 
-    public LiveData<List<Contato>> carregarContatos(){
+    public MutableLiveData<List<Contato>> carregarContatos(){
         MutableLiveData<List<Contato>> contatos = new MutableLiveData<>();
-        db.collection(MEMBROS_DA_EQUIPE).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    List<Contato> listaContatos = new ArrayList<>();
-                    for (QueryDocumentSnapshot document: task.getResult()){
-                        Contato contato = document.toObject(Contato.class);
-                        listaContatos.add(contato);
-                    }
-                    contatos.setValue(listaContatos);
+        db.collection(MEMBROS_DA_EQUIPE).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                List<Contato> listaContatos = new ArrayList<>();
+                for (QueryDocumentSnapshot document: task.getResult()){
+                    Contato contato = document.toObject(Contato.class);
+                    listaContatos.add(contato);
                 }
+                contatos.setValue(listaContatos);
             }
         });
         return contatos;
@@ -71,11 +68,13 @@ public class RepositorioGeral {
 //        return 0;
 //    }
 
-    public void deletarContato (Contato contato, MutableLiveData<String> mensagemParaUsuario){
+    public MutableLiveData<String> deletarContato (Contato contato){
 
+        MutableLiveData<String> mensagemParaUsuario = new MutableLiveData<>();
         db.collection(MEMBROS_DA_EQUIPE).document(contato.getNomeDoMembro())
                 .delete()
                 .addOnSuccessListener(aVoid -> mensagemParaUsuario.setValue("Membro excluído com sucesso"))
                 .addOnFailureListener(e -> mensagemParaUsuario.setValue("Erro: " +e.getMessage()));
+        return mensagemParaUsuario;
     }
 }

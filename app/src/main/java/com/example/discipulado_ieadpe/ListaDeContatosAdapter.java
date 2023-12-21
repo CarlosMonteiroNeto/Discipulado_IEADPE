@@ -67,7 +67,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
 
         holder.btnAbrirWhatsapp.setOnClickListener(view -> abrirConversaWhatsApp(view,
                 Utils.desformatarTelefone(telefone),
-                holder.nomeDoMembro.getText().toString()));
+                nomeDoMembro));
 
 
         holder.btnEditarMembro.setOnClickListener(view -> {
