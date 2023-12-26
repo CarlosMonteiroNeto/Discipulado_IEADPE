@@ -6,24 +6,31 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeContatosViewModel;
+
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatosViewholder> {
 
     private List<Contato> contatos;
     private final String usuarioLogado;
-//    private ContatoDeleteListener contatoDeleteListener;
+    //    private ContatoDeleteListener contatoDeleteListener;
     private final ListaDeContatosViewModel viewModel;
+    private final ActivityResultLauncher<Intent> launcher;
 
-    public ListaDeContatosAdapter(List<Contato> contatos, String usuarioLogado, ListaDeContatosViewModel viewModel){
-        this.contatos = contatos;
+    public ListaDeContatosAdapter(List<Contato> contatos, String usuarioLogado, ListaDeContatosViewModel viewModel, ActivityResultLauncher<Intent> launcher){
+        this.contatos = ordenarContatos(contatos);
         this.usuarioLogado = usuarioLogado;
         this.viewModel = viewModel;
+        this.launcher = launcher;
     }
 
 
@@ -31,7 +38,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
     @Override
     public ListaDeContatosViewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ListaDeContatosViewholder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.lista_de_contatos_viewholder, parent, false));
+                .inflate(R.layout.viewholder_lista_de_contatos, parent, false));
     }
 
     @Override
@@ -76,9 +83,10 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
             contatoAEditar.setFuncao(funcao);
             contatoAEditar.setCongregacao(congregacao);
             contatoAEditar.setTelefone(telefone);
+            contatoAEditar.setDataDeNascimento(contatos.get(position).getDataDeNascimento());
             Intent intent = new Intent(view.getContext(), AddEditMembroActivity.class);
             intent.putExtra(ListaDeContatosActivity.CHAVE_INTENT_DADOS_DO_MEMBRO, contatoAEditar);
-            view.getContext().startActivity(intent);
+            launcher.launch(intent);
         });
 
         holder.btnExcluirMembro.setOnClickListener(view -> {
@@ -102,7 +110,7 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
     }
 
     public void atualizarItens (List < Contato > contatos) {
-        this.contatos = contatos;
+        this.contatos = ordenarContatos(contatos);
         notifyDataSetChanged();
     }
     public void discarTelefone(View view, String telefone) {
@@ -117,6 +125,52 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("https://api.whatsapp.com/send?phone= +55" + telefone + "&text=" + mensagem));
         view.getContext().startActivity(intent);
+    }
+
+    private List<Contato>ordenarContatos(List<Contato> contatosDesordenados) {
+        Comparator<Contato> comparador = Comparator
+                .comparing((Contato c) -> {
+                    switch (c.getCongregacao()) {
+                        case "supervisao":
+                            return 0;
+                        case "matriz":
+                            return 1;
+                        default:
+                            return 2;
+                    }
+                })
+                .thenComparing(Contato::getCongregacao)
+                .thenComparing((Contato c) -> {
+                    switch (c.getFuncao()) {
+                        case "Supervisor das campanhas":
+                            return 0;
+                        case "Vice-supervisor das campanhas":
+                            return 1;
+                        case "Coordenador do discipulado":
+                            return 2;
+                        case "Vice-coordenador do discipulado":
+                            return 3;
+                        case "Assistente de congregacao":
+                            return 4;
+                        case "Dirigente da campanha":
+                            return 5;
+                        case "Vice-dirigente da campanha":
+                            return 6;
+                        case "Professor do discipulado":
+                            return 7;
+                        case "Secretária do discipulado":
+                            return 8;
+                        case "Vice-secretária do discipulado":
+                            return 9;
+                        default:
+                            return 10;
+                    }
+                })
+                .thenComparing(Contato::getNomeDoMembro);
+
+        return contatosDesordenados.stream()
+                .sorted(comparador)
+                .collect(Collectors.toList());
     }
 //    public void verificarWhatsApp(View view, String telefone) {
 //        Intent intent = new Intent(Intent.ACTION_VIEW);

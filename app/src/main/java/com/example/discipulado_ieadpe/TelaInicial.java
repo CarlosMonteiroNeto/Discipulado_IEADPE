@@ -28,7 +28,7 @@ public class TelaInicial extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.DADOS_DE_LOGIN, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        setContentView(R.layout.tela_inicial);
+        setContentView(R.layout.activity_tela_inicial);
         titulobtnContatos = findViewById(R.id.titulo_btn_contatos);
         btnContatos = findViewById(R.id.btn_contatos);
         btnSair = findViewById(R.id.btn_sair);

@@ -56,4 +56,14 @@ public class Contato implements Serializable {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
+
+    private String dataDeNascimento;
+
+    public String getDataDeNascimento() {
+        return dataDeNascimento;
+    }
+
+    public void setDataDeNascimento(String dataDeNascimento) {
+        this.dataDeNascimento = dataDeNascimento;
+    }
 }

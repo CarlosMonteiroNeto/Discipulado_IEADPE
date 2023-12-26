@@ -33,10 +33,10 @@ import java.util.stream.Collectors;
 // como através do botão de editar ao lado de um contato da lista, disponível apenas para usuários com permissão.
 // Neste segundo caso, vem os dados do contato junto com a intent, que preenchem automaticamente as views, bloqueando a edição do nome do contato.
 public class AddEditMembroActivity extends AppCompatActivity {
-    TextView tituloNomeDoUsuario, tituloAddNomeDoMembro, tituloSpnCargo, tituloAddTelefone;
+    TextView tituloNomeDoUsuario, tituloAddNomeDoMembro, tituloSpnCargo, tituloAddTelefone, tituloDataDeNascimento;
     Spinner spnCongregacao, spnCargo;
     EditText editAddNomeDoMembro;
-    MaskedEditText maskedEditAddTelefone;
+    MaskedEditText maskedEditAddTelefone, maskedEditDataDeNascimento;
     Button btnConcluirAddEditMembro;
     ArrayAdapter<CharSequence> spnCargoAdapter;
     ListaDeContatosViewModel viewModel;
@@ -45,7 +45,7 @@ public class AddEditMembroActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_editar_membro);
+        setContentView(R.layout.activity_add_editar_membro);
         viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
         viewModel.getContatos().observe(this, contatos -> listaDeContatos = contatos);
         SharedPreferences sharedPreferences = getSharedPreferences(MainActivity.DADOS_DE_LOGIN, Context.MODE_PRIVATE);
@@ -68,8 +68,10 @@ public class AddEditMembroActivity extends AppCompatActivity {
         tituloAddNomeDoMembro = findViewById(R.id.titulo_add_nome_do_membro);
         tituloSpnCargo = findViewById(R.id.titulo_spinner_cargo);
         tituloAddTelefone = findViewById(R.id.titulo_add_telefone);
+        tituloDataDeNascimento = findViewById(R.id.titulo_add_data_de_nascimento);
         editAddNomeDoMembro = findViewById(R.id.edit_add_nome_do_membro);
         maskedEditAddTelefone = findViewById(R.id.edit_add_telefone);
+        maskedEditDataDeNascimento = findViewById(R.id.edit_add_data_de_nascimento);
 
         Intent intent = getIntent();
         if (intent.getSerializableExtra(ListaDeContatosActivity.CHAVE_INTENT_DADOS_DO_MEMBRO) != null) {
@@ -86,12 +88,16 @@ public class AddEditMembroActivity extends AppCompatActivity {
 
         btnConcluirAddEditMembro.setOnClickListener(v -> {
             if (editAddNomeDoMembro.getText().toString().trim().isEmpty()
-                    || !numeroCelularEhValido(Objects.requireNonNull(maskedEditAddTelefone.getText()).toString())) {
+                    || !numeroCelularEhValido(Objects.requireNonNull(maskedEditAddTelefone.getText()).toString())
+                    || !EhdataSulamericanaValida(maskedEditDataDeNascimento.getText().toString())){
                 if (editAddNomeDoMembro.getText().toString().trim().isEmpty()) {
                     editAddNomeDoMembro.setError("Insira um nome");
                 }
                 if (!numeroCelularEhValido(Objects.requireNonNull(maskedEditAddTelefone.getText()).toString())) {
                     maskedEditAddTelefone.setError("Número inválido");
+                }
+                if(!EhdataSulamericanaValida(maskedEditDataDeNascimento.getText().toString())){
+                    maskedEditDataDeNascimento.setError("Data inválida");
                 }
                 return;
             }
@@ -102,60 +108,60 @@ public class AddEditMembroActivity extends AppCompatActivity {
             contatoNovo.setTelefone(maskedEditAddTelefone.getText().toString());
 //            viewModel.getContatos().observe(this, contatos -> {
 //                listaDeContatos = contatos;
-                List<Contato> contatosPorCongregacao = listaDeContatos.stream()
-                        .filter(contatoGeral -> contatoGeral.getCongregacao().equals(contatoNovo.getCongregacao()))
-                        .collect(Collectors.toList());
+            List<Contato> contatosPorCongregacao = listaDeContatos.stream()
+                    .filter(contatoGeral -> contatoGeral.getCongregacao().equals(contatoNovo.getCongregacao()))
+                    .collect(Collectors.toList());
 
-                List<String> cargosPorCongregacao = contatosPorCongregacao
-                        .stream()
-                        .map(Contato::getFuncao)
-                        .distinct()
-                        .collect(Collectors.toList());
-                if (!contatoNovo.getFuncao().equals("Professor(a) do discipulado")
-                        && cargosPorCongregacao.contains(contatoNovo.getFuncao())) {
+            List<String> cargosPorCongregacao = contatosPorCongregacao
+                    .stream()
+                    .map(Contato::getFuncao)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Intent resultIntent = new Intent();
+            if (!contatoNovo.getFuncao().equals("Professor(a) do discipulado")
+                    && cargosPorCongregacao.contains(contatoNovo.getFuncao())) {
 
 
-                    Contato contatoAtualNaFuncao = new Contato();
-                    for (Contato contatoAtual : contatosPorCongregacao) {
-                        if (contatoAtual.getFuncao().equals(contatoNovo.getFuncao())) {
-                            contatoAtualNaFuncao = contatoAtual;
-                            break;
-                        }
+                Contato contatoAtualNaFuncao = new Contato();
+                for (Contato contatoAtual : contatosPorCongregacao) {
+                    if (contatoAtual.getFuncao().equals(contatoNovo.getFuncao())) {
+                        contatoAtualNaFuncao = contatoAtual;
+                        break;
                     }
-                    //Caso já haja alguém com esta função na congregação, possibilita excluir o membro antigo e logo após,
-                    // adicionar ou atualizar o cargo do membro novo.
-                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-                    dialogBuilder.setTitle("Já existe uma pessoa como " + contatoNovo.getFuncao());
-                    dialogBuilder.setMessage("É " + contatoAtualNaFuncao.getNomeDoMembro() + ". Deseja alterar?");
-                    Contato finalContatoAtualNaFuncao = contatoAtualNaFuncao;
-                    dialogBuilder.setPositiveButton("Alterar", (dialog, which) -> {
-                        viewModel.deletarContato(finalContatoAtualNaFuncao);
-                        // O método addContato retorna uma mensagem de sucesso ou erro.
-                        // Caso seja de erro fecha o dialog sem fechar a activity
-                        addContatoERetornarMensagem(contatoNovo);
-                    });
-                    dialogBuilder.setNegativeButton("Não", (dialog, i) -> {
-                        // Fecha o dialog quando o botão "Cancelar" é pressionado
-                        dialog.dismiss();
-                    });
-                    dialogBuilder.show();
-                } else {
-                    addContatoERetornarMensagem(contatoNovo);
                 }
+                //Caso já haja alguém com esta função na congregação, possibilita excluir o membro antigo e logo após,
+                // adicionar ou atualizar o cargo do membro novo.
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                dialogBuilder.setTitle("Já existe uma pessoa como " + contatoNovo.getFuncao());
+                dialogBuilder.setMessage("É " + contatoAtualNaFuncao.getNomeDoMembro() + ". Deseja alterar?");
+                Contato finalContatoAtualNaFuncao = contatoAtualNaFuncao;
+                dialogBuilder.setPositiveButton("Alterar", (dialog, which) -> {
+                    resultIntent.putExtra("contato a excluir", finalContatoAtualNaFuncao);
+                    // O método addContato retorna uma mensagem de sucesso ou erro.
+                    // Caso seja de erro fecha o dialog sem fechar a activity
+                    retornarContato(contatoNovo, resultIntent);
+                });
+                dialogBuilder.setNegativeButton("Não", (dialog, i) -> {
+                    // Fecha o dialog quando o botão "Cancelar" é pressionado
+                    dialog.dismiss();
+                });
+                dialogBuilder.show();
+            } else {
+                retornarContato(contatoNovo, resultIntent);
+            }
 //            });
             // Garante que só há uma pessoa por cargo em cada congregação, exceto para professor, que pode haver vários.
 
         });
     }
-    private void addContatoERetornarMensagem(Contato contatoNovo){
-        viewModel.addContato(contatoNovo);
+    private void retornarContato(Contato contatoNovo, Intent resultIntent){
+
 //        if (Objects.requireNonNull(mensagem.getValue()).startsWith("Erro")) {
 //            Toast.makeText(getApplicationContext(), mensagem.getValue(), Toast.LENGTH_SHORT).show();
 //        } else {
-//            Intent resultIntent = new Intent();
-//            resultIntent.putExtra("mensagem de sucesso", mensagem.getValue());
-//            setResult(Activity.RESULT_OK, resultIntent);
-            finish();
+        resultIntent.putExtra("contato a adicionar", contatoNovo);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
 //        }
     }
     public boolean numeroCelularEhValido (String numero) {
@@ -166,5 +172,36 @@ public class AddEditMembroActivity extends AppCompatActivity {
         Matcher matcher = pattern.matcher(numero);
 
         return matcher.matches();
+    }
+    public boolean EhdataSulamericanaValida(String date){
+        if(date==null){
+            return false;
+        }
+        // Verifica se a string tem o formato DD/MM/AAAA
+        if (!date.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            return false; // Formato inválido
+        }
+
+        // Extrai os componentes da data
+        String[] parts = date.split("/");
+        int day = Integer.parseInt(parts[0]);
+        int month = Integer.parseInt(parts[1]);
+        int year = Integer.parseInt(parts[2]);
+
+        // Verifica se o dia, mês e ano são válidos
+        if (year < 1000 || year > 9999 || month < 1 || month > 12) {
+            return false; // Ano ou mês inválidos
+        }
+
+        int[] daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
+            daysInMonth[1] = 29; // Ano bissexto, fevereiro tem 29 dias
+        }
+
+        if (day < 1 || day > daysInMonth[month - 1]) {
+            return false; // Dia inválido para o mês e ano fornecidos
+        }
+
+        return true; // Data válida
     }
 }

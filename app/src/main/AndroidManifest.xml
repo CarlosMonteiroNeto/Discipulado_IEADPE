@@ -15,6 +15,12 @@
         android:theme="@style/Theme.Discipulado_IEADPE"
         tools:targetApi="31">
         <activity
+            android:name=".AddEditAlunoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ListaDeAlunosActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -24,9 +30,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddEditMembroActivity" />
-        <activity android:name=".TelaInicial"/>
-        <activity android:name=".ListaDeContatosActivity"/>
-
+        <activity android:name=".TelaInicial" />
+        <activity android:name=".ListaDeContatosActivity" />
     </application>
 
 </manifest>

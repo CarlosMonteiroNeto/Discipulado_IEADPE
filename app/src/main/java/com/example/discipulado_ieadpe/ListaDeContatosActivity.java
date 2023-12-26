@@ -42,7 +42,7 @@ public class ListaDeContatosActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lista_de_contatos_activity);
+        setContentView(R.layout.activity_lista_de_contatos);
 
 //        viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
         tituloListaDeContatos = findViewById(R.id.titulo_lista_de_contatos);
@@ -59,11 +59,6 @@ public class ListaDeContatosActivity extends AppCompatActivity {
         contatos = new ArrayList<>();
         viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
         listaDeContatosRecyclerView = findViewById(R.id.recyclerview_lista_de_contatos);
-        adapter = new ListaDeContatosAdapter(contatos, usuarioLogado, viewModel);
-        listaDeContatosRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        listaDeContatosRecyclerView.setAdapter(adapter);
-        listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
         viewModel.getMensagemDeExclusao().observe(ListaDeContatosActivity.this, mensagem -> {
             if (mensagem != null) {
@@ -75,20 +70,32 @@ public class ListaDeContatosActivity extends AppCompatActivity {
                 Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
             }
         });
+
+        ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK){
+                Intent dados = result.getData();
+                if(dados != null && dados.hasExtra("contato a adicionar")){
+                    if(dados.hasExtra("contato a excluir")){
+                        Contato contatoAExcluir = (Contato) dados.getSerializableExtra("contato a excluir");
+                        viewModel.deletarContato(contatoAExcluir);
+                    }
+                    Contato contatoNovo = (Contato)dados.getSerializableExtra("contato a adicionar");
+                    viewModel.addContato(contatoNovo);
+                }
+            }
+        });
+
+        adapter = new ListaDeContatosAdapter(contatos, usuarioLogado, viewModel, launcher);
+        listaDeContatosRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        listaDeContatosRecyclerView.setAdapter(adapter);
+        listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
+
         viewModel.getContatos().observe(this, contatos -> adapter.atualizarItens(contatos));
 
-//        ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-//            if (result.getResultCode() == Activity.RESULT_OK){
-//                Intent dados = result.getData();
-//                if(dados != null){
-//                    Toast.makeText(this, dados.getStringExtra("mensagem de sucesso"), Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-
-        btnAddMembro.setOnClickListener(view -> abrirActivityDeEdicaoDeMembro());
+        btnAddMembro.setOnClickListener(view -> abrirActivityDeEdicaoDeMembro(launcher));
     }
-    private void abrirActivityDeEdicaoDeMembro(){
-        startActivity(new Intent(this, AddEditMembroActivity.class));
+    private void abrirActivityDeEdicaoDeMembro(ActivityResultLauncher<Intent> launcher){
+        launcher.launch(new Intent(this, AddEditMembroActivity.class));
     }
 }
