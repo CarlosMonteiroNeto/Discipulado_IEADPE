@@ -168,9 +168,9 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
                             return 8;
                         case "Professor(a) do discipulado":
                             return 9;
-                        case "secretária do discipulado":
+                        case "Secretária do discipulado":
                             return 10;
-                        case "vice-secretária do discipulado":
+                        case "Vice-secretária do discipulado":
                             return 11;
                         default:
                             return 12; // Qualquer outra função não listada

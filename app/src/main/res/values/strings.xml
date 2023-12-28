@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Discipulado IEADPE</string>
+    <string name="app_name">Discipulado IEADPE-NSO</string>
 
     <string-array name="cargos_eclesiasticos">
         <item>Presbítero</item>
@@ -22,8 +22,8 @@
         <item>Dirigente de campanha</item>
         <item>Vice-dirigente de campanha</item>
         <item>Professor(a) do discipulado</item>
-        <item>secretária do discipulado</item>
-        <item>vice-secretária do discipulado</item>
+        <item>Secretária do discipulado</item>
+        <item>Vice-secretária do discipulado</item>
     </string-array>
 
     <string-array name="usuarios">
