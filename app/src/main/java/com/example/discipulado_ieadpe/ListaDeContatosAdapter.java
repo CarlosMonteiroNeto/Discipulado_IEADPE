@@ -3,9 +3,11 @@ package com.example.discipulado_ieadpe;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -97,7 +99,11 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(view.getContext());
             dialogBuilder.setTitle("Atenção!");
             dialogBuilder.setMessage("Deseja excluir " + nomeDoMembro + " da equipe?");
-            dialogBuilder.setPositiveButton("Sim", (dialog, which) -> viewModel.deletarContato(contato));
+            dialogBuilder.setPositiveButton("Sim", (dialog, which) -> viewModel.deletarContato(contato).observeForever(mensagem -> {
+                if (mensagem != null) {
+                    Toast.makeText(view.getContext(), mensagem, Toast.LENGTH_SHORT).show();
+                }
+            }));
             dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> dialogInterface.dismiss());
             dialogBuilder.show();
 
@@ -131,9 +137,9 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
         Comparator<Contato> comparador = Comparator
                 .comparing((Contato c) -> {
                     switch (c.getCongregacao()) {
-                        case "supervisao":
+                        case "Supervisão":
                             return 0;
-                        case "matriz":
+                        case "Matriz":
                             return 1;
                         default:
                             return 2;
@@ -148,22 +154,26 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
                             return 1;
                         case "Coordenador do discipulado":
                             return 2;
-                        case "Vice-coordenador do discipulado":
+                        case "Secretária da coordenação":
                             return 3;
-                        case "Assistente de congregacao":
+                        case "Vice secretária da coordenação":
                             return 4;
-                        case "Dirigente da campanha":
+                        case "Vice-coordenador do discipulado":
                             return 5;
-                        case "Vice-dirigente da campanha":
+                        case "Assistente de congregação":
                             return 6;
-                        case "Professor do discipulado":
+                        case "Dirigente de campanha":
                             return 7;
-                        case "Secretária do discipulado":
+                        case "Vice-dirigente de campanha":
                             return 8;
-                        case "Vice-secretária do discipulado":
+                        case "Professor(a) do discipulado":
                             return 9;
-                        default:
+                        case "secretária do discipulado":
                             return 10;
+                        case "vice-secretária do discipulado":
+                            return 11;
+                        default:
+                            return 12; // Qualquer outra função não listada
                     }
                 })
                 .thenComparing(Contato::getNomeDoMembro);

@@ -60,17 +60,6 @@ public class ListaDeContatosActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(ListaDeContatosViewModel.class);
         listaDeContatosRecyclerView = findViewById(R.id.recyclerview_lista_de_contatos);
 
-        viewModel.getMensagemDeExclusao().observe(ListaDeContatosActivity.this, mensagem -> {
-            if (mensagem != null) {
-                Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
-            }
-        });
-        viewModel.getMensagemDeEdicao().observe(this, mensagem -> {
-            if (mensagem != null) {
-                Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
-            }
-        });
-
         ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK){
                 Intent dados = result.getData();
@@ -80,7 +69,11 @@ public class ListaDeContatosActivity extends AppCompatActivity {
                         viewModel.deletarContato(contatoAExcluir);
                     }
                     Contato contatoNovo = (Contato)dados.getSerializableExtra("contato a adicionar");
-                    viewModel.addContato(contatoNovo);
+                    viewModel.addContato(contatoNovo).observe(this, mensagem -> {
+                        if (mensagem != null) {
+                            Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -92,6 +85,17 @@ public class ListaDeContatosActivity extends AppCompatActivity {
         listaDeContatosRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
         viewModel.getContatos().observe(this, contatos -> adapter.atualizarItens(contatos));
+//        viewModel.getMensagemDeExclusao().observe(ListaDeContatosActivity.this, mensagem -> {
+//            if (mensagem != null) {
+//                Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        viewModel.getMensagemDeEdicao().observe(this, mensagem -> {
+//            if (mensagem != null) {
+//                Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
 
         btnAddMembro.setOnClickListener(view -> abrirActivityDeEdicaoDeMembro(launcher));
     }

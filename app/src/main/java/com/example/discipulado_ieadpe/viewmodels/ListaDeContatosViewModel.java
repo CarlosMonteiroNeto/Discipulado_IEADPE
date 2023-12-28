@@ -31,13 +31,13 @@ public class ListaDeContatosViewModel extends AndroidViewModel{
         this.contatos = contatos;
     }
 
-    public void addContato (Contato contato){
+    public MutableLiveData<String> addContato (Contato contato){
         List<Contato> contatosAtuais = contatos.getValue();
+        MutableLiveData<String> mensagem = new MutableLiveData<>();
         if (contatosAtuais == null){
             contatosAtuais = new ArrayList<>();
         }
-        mensagemDeEdicao = repositorioGeral.addContato(contato);
-//        if(mensagem.getValue().equals("Contato adicionado com sucesso")){
+        mensagem = repositorioGeral.addContato(contato);
         boolean substituir = false;
         for (Contato contatoExistente : contatosAtuais){
             if (contatoExistente.getNomeDoMembro().equals(contato.getNomeDoMembro())){
@@ -50,21 +50,19 @@ public class ListaDeContatosViewModel extends AndroidViewModel{
             contatosAtuais.add(contato);
         }
         contatos.setValue(contatosAtuais);
-//        }
+        return mensagem;
     }
 
     //    public int atualizarContato (Contato contato){
 //        return repositorioGeral.atualizarContato(contato);
 //    }
-    public void deletarContato (Contato contato){
+    public MutableLiveData<String> deletarContato (Contato contato){
         List<Contato> contatosAtuais = contatos.getValue();
-        mensagemDeExclusao = repositorioGeral.deletarContato(contato);
-//        if(mensagemDeExclusao != null
-//                && mensagemDeExclusao.getValue() != null
-//                && mensagemDeExclusao.getValue().equals("Membro excluído com sucesso")){
+        MutableLiveData<String> mensagem = new MutableLiveData<>();
+        mensagem.setValue(repositorioGeral.deletarContato(contato).getValue());
         contatosAtuais.remove(contato);
         contatos.setValue(contatosAtuais);
-//        }
+        return mensagem;
     }
     public MutableLiveData<String> getMensagemDeExclusao(){
         return mensagemDeExclusao;

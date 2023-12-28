@@ -9,21 +9,16 @@
     </string-array>
 
     <string-array name="funcoes_supervisor">
-        <item>Assistente de congregação</item>
         <item>Supervisor das campanhas</item>
         <item>Vice-supervisor das campanhas</item>
         <item>Coordenador do discipulado</item>
+        <item>Vice-coordenador do discipulado</item>
         <item>Secretária da coordenação</item>
         <item>Vice secretária da coordenação</item>
-        <item>Vice-coordenador do discipulado</item>
-        <item>Dirigente de campanha</item>
-        <item>Vice-dirigente de campanha</item>
-        <item>Professor(a) do discipulado</item>
-        <item>secretária do discipulado</item>
-        <item>vice-secretária do discipulado</item>
     </string-array>
 
     <string-array name="funcoes_congregacao">
+        <item>Assistente de congregação</item>
         <item>Dirigente de campanha</item>
         <item>Vice-dirigente de campanha</item>
         <item>Professor(a) do discipulado</item>

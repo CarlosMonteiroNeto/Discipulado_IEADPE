@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +24,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeContatosViewModel;
 import com.vicmikhailau.maskededittext.MaskedEditText;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +69,24 @@ public class AddEditMembroActivity extends AppCompatActivity {
         }
         spnCargo = findViewById(R.id.spinner_cargo);
         spnCargo.setAdapter(spnCargoAdapter);
+        spnCongregacao.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = spnCongregacao.getSelectedItem().toString();
+                if ("Supervisão".equals(selectedItem)) {
+                    ArrayAdapter<CharSequence> newAdapter = ArrayAdapter.createFromResource(AddEditMembroActivity.this, R.array.funcoes_supervisor, android.R.layout.simple_spinner_item);
+                    newAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spnCargo.setAdapter(newAdapter);
+                } else {
+                    ArrayAdapter<CharSequence> newAdapter = ArrayAdapter.createFromResource(AddEditMembroActivity.this, R.array.funcoes_congregacao, android.R.layout.simple_spinner_item);
+                    newAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spnCargo.setAdapter(newAdapter);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         tituloNomeDoUsuario = findViewById(R.id.nome_da_congregacao);
         tituloNomeDoUsuario.setText(usuarioLogado);
         tituloAddNomeDoMembro = findViewById(R.id.titulo_add_nome_do_membro);
@@ -83,6 +107,7 @@ public class AddEditMembroActivity extends AppCompatActivity {
             editAddNomeDoMembro.setClickable(false); // Impede cliques
             editAddNomeDoMembro.setCursorVisible(false); // Esconde o cursor
             editAddNomeDoMembro.setTextColor(Color.GRAY);
+            maskedEditDataDeNascimento.setText(contatoAEditar.getDataDeNascimento());
         }
         btnConcluirAddEditMembro = findViewById(R.id.btn_add_edit_membro);
 
@@ -106,6 +131,7 @@ public class AddEditMembroActivity extends AppCompatActivity {
             contatoNovo.setFuncao(spnCargo.getSelectedItem().toString());
             contatoNovo.setNomeDoMembro(editAddNomeDoMembro.getText().toString());
             contatoNovo.setTelefone(maskedEditAddTelefone.getText().toString());
+            contatoNovo.setDataDeNascimento(maskedEditDataDeNascimento.getText().toString());
 //            viewModel.getContatos().observe(this, contatos -> {
 //                listaDeContatos = contatos;
             List<Contato> contatosPorCongregacao = listaDeContatos.stream()
@@ -174,34 +200,65 @@ public class AddEditMembroActivity extends AppCompatActivity {
         return matcher.matches();
     }
     public boolean EhdataSulamericanaValida(String date){
-        if(date==null){
+        // Verifica o padrão da string usando uma expressão regular
+        if (!date.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            return false; // Não corresponde ao padrão "##/##/####"
+        }
+
+        // Divide a string da data em dia, mês e ano
+        String[] partesData = date.split("/");
+
+        // Verifica se os componentes são numéricos
+        for (String parte : partesData) {
+            try {
+                Integer.parseInt(parte);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        // Converte os componentes para inteiros
+        int dia = Integer.parseInt(partesData[0]);
+        int mes = Integer.parseInt(partesData[1]);
+        int ano = Integer.parseInt(partesData[2]);
+
+        // Verifica se o dia, mês e ano estão dentro dos limites aceitáveis
+        if (dia < 1 || dia > 31 || mes < 1 || mes > 12 || ano < 1900) {
             return false;
         }
-        // Verifica se a string tem o formato DD/MM/AAAA
-        if (!date.matches("\\d{2}/\\d{2}/\\d{4}")) {
-            return false; // Formato inválido
+        // Verifica meses com 30 dias
+        if ((mes == 4 || mes == 6 || mes == 9 || mes == 11) && dia > 30) {
+            return false;
+        }
+        // Verifica fevereiro e anos bissextos
+        if (mes == 2) {
+            if (ano % 4 == 0 && (ano % 100 != 0 || ano % 400 == 0)) { // Ano bissexto
+                if (dia > 29) {
+                    return false;
+                }
+            } else {
+                if (dia > 28) {
+                    return false;
+                }
+            }
         }
 
-        // Extrai os componentes da data
-        String[] parts = date.split("/");
-        int day = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        int year = Integer.parseInt(parts[2]);
+        // Obtém a data atual e define o limite de 10 anos atrás
+        Calendar dataAtual = Calendar.getInstance();
+        dataAtual.add(Calendar.YEAR, -10);
 
-        // Verifica se o dia, mês e ano são válidos
-        if (year < 1000 || year > 9999 || month < 1 || month > 12) {
-            return false; // Ano ou mês inválidos
+        // Cria a data limite de 10 anos atrás
+        Date dataLimite = dataAtual.getTime();
+
+        // Converte a data fornecida para um objeto Date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        Date dataInformada;
+        try {
+            dataInformada = sdf.parse(date);
+        } catch (Exception e) {
+            return false;
         }
 
-        int[] daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
-            daysInMonth[1] = 29; // Ano bissexto, fevereiro tem 29 dias
-        }
-
-        if (day < 1 || day > daysInMonth[month - 1]) {
-            return false; // Dia inválido para o mês e ano fornecidos
-        }
-
-        return true; // Data válida
+        // Verifica se a data está dentro do limite de 10 anos atrás
+        return dataInformada.before(dataLimite);
     }
 }
