@@ -1,32 +1,40 @@
 package com.example.discipulado_ieadpe;
 
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.discipulado_ieadpe.database.entities.Aluno;
 import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeAlunosViewModel;
-import com.example.discipulado_ieadpe.viewmodels.ListaDeContatosViewModel;
 
 import java.util.List;
 
 public class ListaDeAlunosAdapter extends RecyclerView.Adapter<ListaDeAlunosAdapter.ListaDeAlunosViewholder>{
 
     private List<Aluno> alunos;
+    //TODO Usar usuário logado para definir se vai carregar tudo ou só os alunos da congregação
     private final String usuarioLogado;
     private final ListaDeAlunosViewModel viewModel;
+    ActivityResultLauncher<Intent> launcher;
+    public static final String CHAVE_INTENT_DADOS_DO_ALUNO = "Dados do aluno";
 
-    public ListaDeAlunosAdapter(List<Aluno> alunos, String usuarioLogado, ListaDeAlunosViewModel viewModel){
-        //TODO Vai precisar disso no construtor ou algo a mais?
-        this.alunos = alunos;
+
+    public ListaDeAlunosAdapter(List<Aluno> alunos, String usuarioLogado, ListaDeAlunosViewModel viewModel, ActivityResultLauncher<Intent> launcher){
+        this.alunos = alunosOrdenados(alunos);
         this.usuarioLogado = usuarioLogado;
         this.viewModel = viewModel;
+        this.launcher = launcher;
     }
 
     @NonNull
@@ -39,6 +47,56 @@ public class ListaDeAlunosAdapter extends RecyclerView.Adapter<ListaDeAlunosAdap
     @Override
     public void onBindViewHolder(@NonNull ListaDeAlunosViewholder holder, int position) {
 
+            Aluno aluno = alunos.get(position);
+            String nomeDoAluno = aluno.getNomeDoAluno();
+            String congregacao = aluno.getCongregacao();
+            String turma = aluno.getTurma();
+            String telefone = aluno.getTelefone();
+            holder.nomeDoAluno.setText(nomeDoAluno);
+            holder.congregacaoDoAluno.setText(congregacao);
+            holder.turmaDoAluno.setText(turma);
+            holder.telefoneDoAluno.setText(telefone);
+
+            holder.btnFichaCompleta.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), AddEditAlunoActivity.class);
+                intent.putExtra(CHAVE_INTENT_DADOS_DO_ALUNO, aluno);
+                intent.putExtra("origem", "botão ficha completa");
+                v.getContext().startActivity(intent);
+            });
+
+        holder.btnLigar.setOnClickListener(view -> discarTelefone(view,
+                Utils.desformatarTelefone(telefone)));
+
+        holder.btnAbrirWhatsapp.setOnClickListener(view -> abrirConversaWhatsApp(view,
+                Utils.desformatarTelefone(telefone),
+                nomeDoAluno));
+
+        holder.btnEditarAluno.setOnClickListener(view -> {
+            Intent intent = new Intent(view.getContext(), AddEditAlunoActivity.class);
+            intent.putExtra(CHAVE_INTENT_DADOS_DO_ALUNO, aluno);
+            intent.putExtra("origem", "botão editar aluno");
+            launcher.launch(intent);
+        });
+
+        holder.btnExcluirAluno.setOnClickListener(view -> {
+//            int adapterPosition = holder.getAdapterPosition();
+//            if (adapterPosition != RecyclerView.NO_POSITION) {
+//                Contato contatoAExcluir = contatos.get(adapterPosition);
+//            }
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(view.getContext());
+            dialogBuilder.setTitle("Atenção!");
+            dialogBuilder.setMessage("Deseja excluir " + nomeDoAluno + " da equipe?");
+            dialogBuilder.setPositiveButton("Sim", (dialog, which) -> viewModel.deletarAluno(aluno)
+//                    .observeForever(mensagem -> {
+//                if (mensagem != null) {
+//                    Toast.makeText(view.getContext(), mensagem, Toast.LENGTH_SHORT).show();
+//                }
+//            })
+            );
+            dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> dialogInterface.dismiss());
+            dialogBuilder.show();
+
+        });
     }
 
     @Override
@@ -47,20 +105,49 @@ public class ListaDeAlunosAdapter extends RecyclerView.Adapter<ListaDeAlunosAdap
     }
 
     public void atualizarItens (List <Aluno> alunos) {
-        //TODO Ordenar alunos
-        this.alunos = alunos;
+        this.alunos = alunosOrdenados(alunos);
         notifyDataSetChanged();
+    }
+
+    public void discarTelefone(View view, String telefone) {
+
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + telefone));
+        view.getContext().startActivity(intent);
+    }
+
+    public void abrirConversaWhatsApp(View view, String telefone, String nomeDoContato) {
+        String mensagem = "A paz do Senhor, "+ nomeDoContato +"! Tudo bem?";
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("https://api.whatsapp.com/send?phone= +55" + telefone + "&text=" + mensagem));
+        view.getContext().startActivity(intent);
+    }
+
+    public List<Aluno> alunosOrdenados(List<Aluno> listaDesordenada) {
+
+        listaDesordenada.sort((aluno1, aluno2) -> {
+            int comparacaoTurma = aluno1.getTurma().compareTo(aluno2.getTurma());
+            if (comparacaoTurma != 0) {
+                return comparacaoTurma;
+            } else {
+                return aluno1.getNomeDoAluno().compareTo(aluno2.getNomeDoAluno());
+            }
+        });
+
+        return listaDesordenada;
     }
     public static class ListaDeAlunosViewholder extends RecyclerView.ViewHolder {
 
-        public TextView nomeDoAluno, congregacaoDoAluno, telefoneDoAluno;
-        public ImageButton btnLigar, btnAbrirWhatsapp, btnEditarAluno, btnExcluirAluno;
+        public TextView nomeDoAluno, congregacaoDoAluno, turmaDoAluno, telefoneDoAluno;
+        public ImageButton btnFichaCompleta, btnLigar, btnAbrirWhatsapp, btnEditarAluno, btnExcluirAluno;
 
         public ListaDeAlunosViewholder(@NonNull View itemView) {
             super(itemView);
             nomeDoAluno = itemView.findViewById(R.id.nome_do_aluno);
             congregacaoDoAluno = itemView.findViewById(R.id.congregacao_do_aluno);
+            turmaDoAluno = itemView.findViewById(R.id.turma_do_aluno);
             telefoneDoAluno = itemView.findViewById(R.id.telefone_do_aluno);
+            btnFichaCompleta = itemView.findViewById(R.id.btn_ficha_completa);
             btnLigar = itemView.findViewById(R.id.btn_ligar);
             btnAbrirWhatsapp = itemView.findViewById(R.id.btn_abrir_whatsapp);
             btnEditarAluno = itemView.findViewById(R.id.btn_editar_aluno);

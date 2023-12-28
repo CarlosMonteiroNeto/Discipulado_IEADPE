@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class RepositorioGeral {
 
@@ -17,6 +18,7 @@ public class RepositorioGeral {
 //    AppDatabase db;
 private final FirebaseFirestore db;
     private final String MEMBROS_DA_EQUIPE = "Equipe";
+    private final String CONGREGACAO = "Congregação";
     private final String ALUNOS = "Alunos";
     public RepositorioGeral(){
         db = FirebaseFirestore.getInstance();
@@ -74,9 +76,10 @@ private final FirebaseFirestore db;
         return mensagemParaUsuario;
     }
 
-    public MutableLiveData<List<Aluno>> carregarAlunos(){
+    public MutableLiveData<List<Aluno>> carregarAlunosPorCongregacao(String congregacao){
         MutableLiveData<List<Aluno>> alunos = new MutableLiveData<>();
-        db.collection(ALUNOS).get().addOnCompleteListener(task -> {
+        db.collection(ALUNOS).whereEqualTo("congregacao", congregacao)
+                .get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 List<Aluno> listaAlunos = new ArrayList<>();
                 for (QueryDocumentSnapshot document: task.getResult()){
@@ -93,14 +96,9 @@ private final FirebaseFirestore db;
 
         MutableLiveData<String> mensagemParaUsuario = new MutableLiveData<>();
 
-        Map<String, Object> membro = new HashMap<>();
-        membro.put("nomeDoMembro", aluno.getNomeDoAluno());
-//        membro.put("funcao", aluno.getFuncao());
-//        membro.put("congregacao", aluno.getCongregacao());
-//        membro.put("telefone", aluno.getTelefone());
-
-        db.collection(MEMBROS_DA_EQUIPE)
-                .document(aluno.getNomeDoAluno()).set(membro)
+        //TODO Colocar Identificação única como chave primária do aluno
+        db.collection(ALUNOS)
+                .add(aluno)
                 .addOnSuccessListener(unused -> {
                     mensagemParaUsuario.setValue("Contato adicionado com sucesso");
                     Log.d("Sucesso ao add", "DocumentSnapshot added");
@@ -118,7 +116,7 @@ private final FirebaseFirestore db;
     public MutableLiveData<String> deletarAluno (Aluno aluno){
 
         MutableLiveData<String> mensagemParaUsuario = new MutableLiveData<>();
-        db.collection(MEMBROS_DA_EQUIPE).document(aluno.getNomeDoAluno())
+        db.collection(ALUNOS).document(aluno.getID())
                 .delete()
                 .addOnSuccessListener(aVoid -> mensagemParaUsuario.setValue("Membro excluído com sucesso"))
                 .addOnFailureListener(e -> mensagemParaUsuario.setValue("Erro: " +e.getMessage()));

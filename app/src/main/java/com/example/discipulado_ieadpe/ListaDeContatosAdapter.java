@@ -80,14 +80,8 @@ public class ListaDeContatosAdapter extends RecyclerView.Adapter<ListaDeContatos
 
 
         holder.btnEditarMembro.setOnClickListener(view -> {
-            Contato contatoAEditar = new Contato();
-            contatoAEditar.setNomeDoMembro(nomeDoMembro);
-            contatoAEditar.setFuncao(funcao);
-            contatoAEditar.setCongregacao(congregacao);
-            contatoAEditar.setTelefone(telefone);
-            contatoAEditar.setDataDeNascimento(contatos.get(position).getDataDeNascimento());
             Intent intent = new Intent(view.getContext(), AddEditMembroActivity.class);
-            intent.putExtra(ListaDeContatosActivity.CHAVE_INTENT_DADOS_DO_MEMBRO, contatoAEditar);
+            intent.putExtra(ListaDeContatosActivity.CHAVE_INTENT_DADOS_DO_MEMBRO, contato);
             launcher.launch(intent);
         });
 

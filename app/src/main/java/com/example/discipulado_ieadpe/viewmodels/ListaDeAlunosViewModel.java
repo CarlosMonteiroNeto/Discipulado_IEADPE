@@ -16,24 +16,26 @@ import java.util.List;
 public class ListaDeAlunosViewModel extends AndroidViewModel {
 
     private final RepositorioGeral repositorioGeral;
-    private MutableLiveData<List<Aluno>> alunos;
+    private MutableLiveData<List<Aluno>> alunosPorCongregacao;
     private MutableLiveData<String> mensagemDeExclusao = new MutableLiveData<>();
     private MutableLiveData<String> mensagemDeEdicao = new MutableLiveData<>();
 
     public ListaDeAlunosViewModel(@NonNull Application application) {
         super(application);
         repositorioGeral = new RepositorioGeral();
-        alunos = repositorioGeral.carregarAlunos();
     }
 
-    public LiveData<List<Aluno>> getAlunos(){return alunos;}
+    public LiveData<List<Aluno>> getAlunosPorCongregacao(){return alunosPorCongregacao;}
 
+    public void carregarAlunos(String congregacao){
+        alunosPorCongregacao = repositorioGeral.carregarAlunosPorCongregacao(congregacao);
+    }
     public void setAlunos(MutableLiveData<List<Aluno>> alunos) {
-        this.alunos = alunos;
+        this.alunosPorCongregacao = alunos;
     }
 
     public void addAluno (Aluno aluno){
-        List<Aluno> alunosAtuais = alunos.getValue();
+        List<Aluno> alunosAtuais = alunosPorCongregacao.getValue();
         if (alunosAtuais == null){
             alunosAtuais = new ArrayList<>();
         }
@@ -41,7 +43,7 @@ public class ListaDeAlunosViewModel extends AndroidViewModel {
 //        if(mensagem.getValue().equals("Contato adicionado com sucesso")){
         boolean substituir = false;
         for (Aluno alunoExistente : alunosAtuais){
-            if (alunoExistente.getNomeDoAluno().equals(aluno.getNomeDoAluno())){
+            if (alunoExistente.getID().equals(aluno.getID())){
                 alunosAtuais.set(alunosAtuais.indexOf(alunoExistente), aluno);
                 substituir = true;
                 break;
@@ -50,7 +52,7 @@ public class ListaDeAlunosViewModel extends AndroidViewModel {
         if (!substituir){
             alunosAtuais.add(aluno);
         }
-        alunos.setValue(alunosAtuais);
+        alunosPorCongregacao.setValue(alunosAtuais);
 //        }
     }
 
@@ -58,13 +60,13 @@ public class ListaDeAlunosViewModel extends AndroidViewModel {
 //        return repositorioGeral.atualizarContato(contato);
 //    }
     public void deletarAluno (Aluno aluno){
-        List<Aluno> alunosAtuais = alunos.getValue();
+        List<Aluno> alunosAtuais = alunosPorCongregacao.getValue();
         mensagemDeExclusao = repositorioGeral.deletarAluno(aluno);
 //        if(mensagemDeExclusao != null
 //                && mensagemDeExclusao.getValue() != null
 //                && mensagemDeExclusao.getValue().equals("Membro excluído com sucesso")){
         alunosAtuais.remove(aluno);
-        alunos.setValue(alunosAtuais);
+        alunosPorCongregacao.setValue(alunosAtuais);
 //        }
     }
     public MutableLiveData<String> getMensagemDeExclusao(){

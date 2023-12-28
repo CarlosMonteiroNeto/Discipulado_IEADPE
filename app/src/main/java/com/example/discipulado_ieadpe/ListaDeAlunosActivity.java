@@ -46,8 +46,24 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
 
         alunos = new ArrayList<>();
         viewModel = new ViewModelProvider(this).get(ListaDeAlunosViewModel.class);
+        viewModel.carregarAlunos(usuarioLogado);
         listaDeAlunosRecycler = findViewById(R.id.recyclerview_lista_de_alunos);
-        adapter = new ListaDeAlunosAdapter(alunos, usuarioLogado, viewModel);
+
+        ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK){
+                Intent dados = result.getData();
+                if(dados != null && dados.hasExtra("aluno a adicionar")){
+                    if(dados.hasExtra("aluno a excluir")){
+                        Aluno alunoAExcluir = (Aluno) dados.getSerializableExtra("aluno a excluir");
+                        viewModel.deletarAluno(alunoAExcluir);
+                    }
+                    Aluno alunoNovo = (Aluno)dados.getSerializableExtra("aluno a adicionar");
+                    viewModel.addAluno(alunoNovo);
+                }
+            }
+        });
+
+        adapter = new ListaDeAlunosAdapter(alunos, usuarioLogado, viewModel, launcher);
         listaDeAlunosRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         listaDeAlunosRecycler.setAdapter(adapter);
         listaDeAlunosRecycler.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
@@ -63,21 +79,7 @@ public class ListaDeAlunosActivity extends AppCompatActivity {
                 Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
             }
         });
-        viewModel.getAlunos().observe(this, alunos -> adapter.atualizarItens(alunos));
-
-        ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK){
-                Intent dados = result.getData();
-                if(dados != null && dados.hasExtra("aluno a adicionar")){
-                    if(dados.hasExtra("aluno a excluir")){
-                        Aluno alunoAExcluir = (Aluno) dados.getSerializableExtra("aluno a excluir");
-                        viewModel.deletarAluno(alunoAExcluir);
-                    }
-                    Aluno alunoNovo = (Aluno)dados.getSerializableExtra("aluno a adicionar");
-                    viewModel.addAluno(alunoNovo);
-                }
-            }
-        });
+        viewModel.getAlunosPorCongregacao().observe(this, alunos -> adapter.atualizarItens(alunos));
 
         btnAddAluno.setOnClickListener(view -> abrirActivityDeEdicaoDeAluno(launcher));
     }
