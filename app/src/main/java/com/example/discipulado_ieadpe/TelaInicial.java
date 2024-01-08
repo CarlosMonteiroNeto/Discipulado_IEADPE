@@ -45,7 +45,9 @@ public class TelaInicial extends AppCompatActivity {
             Log.d("Usuário após putstring: ", sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO));
             editor.apply();
             Log.d("Usuário após apply: ", sharedPreferences.getString(MainActivity.CHAVE_USUARIO, MainActivity.USUARIO_PADRAO));
-            startActivity(new Intent(TelaInicial.this, MainActivity.class));
+            Intent intent = new Intent(TelaInicial.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         });
     }
 }
