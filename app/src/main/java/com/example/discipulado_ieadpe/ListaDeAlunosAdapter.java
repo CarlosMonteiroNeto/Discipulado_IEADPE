@@ -8,14 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.discipulado_ieadpe.database.entities.Aluno;
-import com.example.discipulado_ieadpe.database.entities.Contato;
 import com.example.discipulado_ieadpe.viewmodels.ListaDeAlunosViewModel;
 
 import java.util.List;
@@ -24,17 +22,18 @@ public class ListaDeAlunosAdapter extends RecyclerView.Adapter<ListaDeAlunosAdap
 
     private List<Aluno> alunos;
     //TODO Usar usuário logado para definir se vai carregar tudo ou só os alunos da congregação
-    private final String usuarioLogado;
-    private final ListaDeAlunosViewModel viewModel;
-    ActivityResultLauncher<Intent> launcher;
+//    private final String usuarioLogado;
+//    private final ListaDeAlunosViewModel viewModel;
+//    ActivityResultLauncher<Intent> launcher;
     public static final String CHAVE_INTENT_DADOS_DO_ALUNO = "Dados do aluno";
+    private OnWriteClickListener listener;
 
 
-    public ListaDeAlunosAdapter(List<Aluno> alunos, String usuarioLogado, ListaDeAlunosViewModel viewModel, ActivityResultLauncher<Intent> launcher){
+    public ListaDeAlunosAdapter(List<Aluno> alunos){
         this.alunos = alunosOrdenados(alunos);
-        this.usuarioLogado = usuarioLogado;
-        this.viewModel = viewModel;
-        this.launcher = launcher;
+//        this.usuarioLogado = usuarioLogado;
+//        this.viewModel = viewModel;
+//        this.launcher = launcher;
     }
 
     @NonNull
@@ -58,7 +57,7 @@ public class ListaDeAlunosAdapter extends RecyclerView.Adapter<ListaDeAlunosAdap
             holder.telefoneDoAluno.setText(telefone);
 
             holder.btnFichaCompleta.setOnClickListener(v -> {
-                Intent intent = new Intent(v.getContext(), AddEditAlunoActivity.class);
+                Intent intent = new Intent(v.getContext(), AddEditAlunoFragment.class);
                 intent.putExtra(CHAVE_INTENT_DADOS_DO_ALUNO, aluno);
                 intent.putExtra("origem", "botão ficha completa");
                 v.getContext().startActivity(intent);
@@ -72,27 +71,19 @@ public class ListaDeAlunosAdapter extends RecyclerView.Adapter<ListaDeAlunosAdap
                 nomeDoAluno));
 
         holder.btnEditarAluno.setOnClickListener(view -> {
-            Intent intent = new Intent(view.getContext(), AddEditAlunoActivity.class);
-            intent.putExtra(CHAVE_INTENT_DADOS_DO_ALUNO, aluno);
-            intent.putExtra("origem", "botão editar aluno");
-            launcher.launch(intent);
+            listener.onUpdateClick(aluno);
+//            Intent intent = new Intent(view.getContext(), AddEditAlunoFragment.class);
+//            intent.putExtra(CHAVE_INTENT_DADOS_DO_ALUNO, aluno);
+//            intent.putExtra("origem", "botão editar aluno");
+//            launcher.launch(intent);
         });
 
         holder.btnExcluirAluno.setOnClickListener(view -> {
-//            int adapterPosition = holder.getAdapterPosition();
-//            if (adapterPosition != RecyclerView.NO_POSITION) {
-//                Contato contatoAExcluir = contatos.get(adapterPosition);
-//            }
+
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(view.getContext());
             dialogBuilder.setTitle("Atenção!");
-            dialogBuilder.setMessage("Deseja excluir " + nomeDoAluno + " da equipe?");
-            dialogBuilder.setPositiveButton("Sim", (dialog, which) -> viewModel.deletarAluno(aluno)
-//                    .observeForever(mensagem -> {
-//                if (mensagem != null) {
-//                    Toast.makeText(view.getContext(), mensagem, Toast.LENGTH_SHORT).show();
-//                }
-//            })
-            );
+            dialogBuilder.setMessage("Deseja excluir " + nomeDoAluno + "?");
+            dialogBuilder.setPositiveButton("Sim", (dialog, which) -> listener.onDeleteClick(position));
             dialogBuilder.setNegativeButton("Não", (dialogInterface, i) -> dialogInterface.dismiss());
             dialogBuilder.show();
 
@@ -153,5 +144,13 @@ public class ListaDeAlunosAdapter extends RecyclerView.Adapter<ListaDeAlunosAdap
             btnEditarAluno = itemView.findViewById(R.id.btn_editar_aluno);
             btnExcluirAluno = itemView.findViewById(R.id.btn_excluir_aluno);
         }
+    }
+
+    public void setOnWriteClickListener(OnWriteClickListener listener){
+        this.listener = listener;
+    }
+    public interface OnWriteClickListener{
+        public void onUpdateClick(Aluno aluno);
+        public void onDeleteClick(int position);
     }
 }

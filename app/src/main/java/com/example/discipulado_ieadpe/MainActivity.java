@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnLogin;
     ImageButton btnContatos;
     public static String DADOS_DE_LOGIN = "Dados de login";
-    public static String CHAVE_USUARIO = "CHAVE_USUARIO";
+    public static String CHAVE_USUARIO = "Usuário logado";
     public static String CHAVE_LOGIN_AUTOMATICO = "CHAVE_LOGIN_AUTOMATICO";
     public static String USUARIO_PADRAO = "";
     public static boolean LOGIN_AUTOMATICO_PADRAO = false;

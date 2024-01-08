@@ -15,7 +15,7 @@
         android:theme="@style/Theme.Discipulado_IEADPE"
         tools:targetApi="31">
         <activity
-            android:name=".AddEditAlunoActivity"
+            android:name=".AddEditAlunoFragment"
             android:exported="false" />
         <activity
             android:name=".ListaDeAlunosActivity"

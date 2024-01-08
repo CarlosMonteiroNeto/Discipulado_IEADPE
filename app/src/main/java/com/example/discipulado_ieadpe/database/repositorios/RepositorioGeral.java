@@ -1,9 +1,16 @@
 package com.example.discipulado_ieadpe.database.repositorios;
 
+import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
+
+import com.example.discipulado_ieadpe.MainActivity;
 import com.example.discipulado_ieadpe.database.entities.Aluno;
 import com.example.discipulado_ieadpe.database.entities.Contato;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
@@ -91,36 +98,46 @@ private final FirebaseFirestore db;
         });
         return alunos;
     }
-//TODO Corrigir carregando os dados do aluno
-    public MutableLiveData<String> addAluno (Aluno aluno){
+    public Bundle addAluno (String usuarioLogado, Aluno aluno){
 
-        MutableLiveData<String> mensagemParaUsuario = new MutableLiveData<>();
+        Bundle writePackage = new Bundle();
 
-        //TODO Colocar Identificação única como chave primária do aluno
-        db.collection(ALUNOS)
+        db.collection(MainActivity.CHAVE_USUARIO).document(usuarioLogado).collection(ALUNOS)
                 .add(aluno)
                 .addOnSuccessListener(unused -> {
-                    mensagemParaUsuario.setValue("Contato adicionado com sucesso");
-                    Log.d("Sucesso ao add", "DocumentSnapshot added");
+                    writePackage.putString("mensagem", "Adicionado com sucesso");
+                    writePackage.putSerializable("objeto", aluno);
                 })
-                .addOnFailureListener(e -> {
-                    mensagemParaUsuario.setValue("Erro: " + e.getMessage());
-                    Log.w("Falha ao add", "Error adding document", e);
-                });
-        return mensagemParaUsuario;
+                .addOnFailureListener(e -> writePackage.putString("mensagem", "Erro: " +e.getMessage()));
+        return writePackage;
     }
-//    public int atualizarContato (Contato contato){
-//        return 0;
-//    }
 
-    public MutableLiveData<String> deletarAluno (Aluno aluno){
+    public Bundle atualizarAluno(String usuarioLogado, Aluno aluno, int position){
+        Bundle writePackage = new Bundle();
+        db.collection(MainActivity.CHAVE_USUARIO).document(usuarioLogado)
+                .collection(ALUNOS).document(aluno.getID())
+                .set(aluno)
+                .addOnSuccessListener(unused -> {
+                    writePackage.putString("mensagem", "Atualizado com sucesso");
+                    writePackage.putInt("position", position);
+                    writePackage.putSerializable("objeto", aluno);
+                })
+                .addOnFailureListener(e -> writePackage.putString("mensagem", "Erro: " +e.getMessage()));
+        return writePackage;
+    }
 
-        MutableLiveData<String> mensagemParaUsuario = new MutableLiveData<>();
-        db.collection(ALUNOS).document(aluno.getID())
+    public Bundle deletarAluno (String usuarioLogado, String idDoAluno, int position){
+
+        Bundle writePackage = new Bundle();
+        db.collection(MainActivity.CHAVE_USUARIO).document(usuarioLogado)
+                .collection(ALUNOS).document(idDoAluno)
                 .delete()
-                .addOnSuccessListener(aVoid -> mensagemParaUsuario.setValue("Membro excluído com sucesso"))
-                .addOnFailureListener(e -> mensagemParaUsuario.setValue("Erro: " +e.getMessage()));
-        return mensagemParaUsuario;
+                .addOnSuccessListener(aVoid -> {
+                    writePackage.putString("mensagem", "Membro excluído com sucesso");
+                    writePackage.putInt("position", position);
+                })
+                .addOnFailureListener(e -> writePackage.putString("mensagem", "Erro: " +e.getMessage()));
+        return writePackage;
     }
 
 }
