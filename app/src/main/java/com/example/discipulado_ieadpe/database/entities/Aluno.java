@@ -34,6 +34,10 @@ public class Aluno implements Serializable {
     private boolean desejaSeBatizar;
     Map<String, Boolean> aulasAssistidas;
 
+    private String notaBasico;
+    private String notaIntermediario;
+    private String notaAvancado;
+
     public String getNomeDoAluno() {
         return nomeDoAluno;
     }
@@ -150,5 +154,29 @@ public class Aluno implements Serializable {
 
     public void setTurma(String turma) {
         this.turma = turma;
+    }
+
+    public String getNotaBasico() {
+        return notaBasico;
+    }
+
+    public void setNotaBasico(String notaBasico) {
+        this.notaBasico = notaBasico;
+    }
+
+    public String getNotaIntermediario() {
+        return notaIntermediario;
+    }
+
+    public void setNotaIntermediario(String notaIntermediario) {
+        this.notaIntermediario = notaIntermediario;
+    }
+
+    public String getNotaAvancado() {
+        return notaAvancado;
+    }
+
+    public void setNotaAvancado(String notaAvancado) {
+        this.notaAvancado = notaAvancado;
     }
 }

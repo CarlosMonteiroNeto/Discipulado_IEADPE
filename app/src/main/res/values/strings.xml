@@ -71,4 +71,43 @@
         <item>57289346</item>
     </string-array>
 
+    <string-array name="escolaridade">
+        <item>Fundamental incompleto</item>
+        <item>Fundamental completo</item>
+        <item>Médio incompleto</item>
+        <item>Médio completo</item>
+        <item>Superior incompleto</item>
+        <item>Superior completo</item>
+    </string-array>
+
+    <string-array name="estado_civil">
+        <item>Solteiro(a)</item>
+        <item>Casado(a)</item>
+    </string-array>
+
+    <string-array name="aulas_do_discipulado">
+        <item>Introdução ao discipulado</item>
+        <item>História das Assembleias de Deus</item>
+        <item>Tendo uma nova conduta</item>
+        <item>Superando conflitos e dúvidas</item>
+        <item>Introdução à Bíblia</item>
+        <item>Conhecendo Jesus</item>
+        <item>O plano de Deus para a humanidade</item>
+        <item>O que é salvação</item>
+        <item>O que é pecado</item>
+        <item>Santificação</item>
+        <item>Obediência</item>
+        <item>Oração</item>
+        <item>O fruto do Espírito Santo</item>
+        <item>Mordomia Cristã</item>
+        <item>A Igreja (O corpo de Cristo)</item>
+        <item>Doutrinas, costumes, e normas da igreja</item>
+        <item>O batismo com o Espírito Santo</item>
+        <item>A trindade divina</item>
+        <item>Heresias (falsos ensinos)</item>
+        <item>O final dos tempos</item>
+        <item>Ordenanças bíblicas</item>
+        <item>Evangelismo</item>
+    </string-array>
+
 </resources>

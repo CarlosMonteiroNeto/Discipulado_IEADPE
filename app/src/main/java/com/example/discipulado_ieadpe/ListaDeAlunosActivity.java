@@ -68,6 +68,7 @@ public class ListaDeAlunosActivity extends AppCompatActivity implements AddEditA
             public void onUpdateClick(Aluno aluno) {
                 AddEditAlunoFragment fragment = new AddEditAlunoFragment();
                 Bundle bundle = new Bundle();
+                bundle.putString(MainActivity.CHAVE_USUARIO, usuarioLogado);
                 bundle.putSerializable("objeto", aluno);
                 fragment.setArguments(bundle);
                 fm.beginTransaction().add(R.id.fragment_lista, fragment)
@@ -118,8 +119,14 @@ public class ListaDeAlunosActivity extends AppCompatActivity implements AddEditA
             Toast.makeText(this, bundle.getString("mensagem"), Toast.LENGTH_SHORT).show();
         });
 
-        btnAddAluno.setOnClickListener(view -> fm.beginTransaction().add(R.id.fragment_lista, new AddEditAlunoFragment())
-                .addToBackStack(null).commit());
+        btnAddAluno.setOnClickListener(view -> {
+            AddEditAlunoFragment fragment = new AddEditAlunoFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(MainActivity.CHAVE_USUARIO, usuarioLogado);
+            fragment.setArguments(bundle);
+            fm.beginTransaction().add(R.id.fragment_lista, fragment)
+                    .addToBackStack(null).commit();
+        });
     }
 //    private void abrirActivityDeEdicaoDeAluno(ActivityResultLauncher<Intent> launcher){
 //        launcher.launch(new Intent(this, AddEditAlunoFragment.class));
